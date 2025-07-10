@@ -1,0 +1,42 @@
+# Build output
+dist/
+build/
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Cache
+.cache/
+vite.cache/
+*.tsbuildinfo
+
+# Optional: TypeScript output if you ever run `tsc` separately
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# Mac OS finder and other hidden system files
+.AppleDouble
+.LSOverride
