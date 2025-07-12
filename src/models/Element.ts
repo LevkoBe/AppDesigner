@@ -33,11 +33,6 @@ export class Element {
 
     if (parent) {
       parent.children.push(this);
-
-      if (type === "input" || type === "output") {
-        this.x = parent.x + parent.width + 20;
-        this.y = parent.y + (parent.children.length - 1) * 50;
-      }
     }
   }
 

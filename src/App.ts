@@ -5,6 +5,7 @@ import { ContextMenu } from "./ui/ContextMenu.ts";
 import { ProjectManager } from "./utils/ProjectManager.ts";
 import { Mode, ElementType } from "./types.ts";
 import { ViewControls } from "./ui/ViewControls.ts";
+import { PropertiesPanel } from "./ui/PropertiesPanel.ts";
 
 export class App {
   private appState: AppState;
@@ -13,6 +14,7 @@ export class App {
   private contextMenu: ContextMenu;
   private projectManager: ProjectManager;
   private viewControls: ViewControls;
+  private propertiesPanel: PropertiesPanel;
 
   constructor() {
     const canvas = document.getElementById("canvas") as HTMLElement;
@@ -22,7 +24,12 @@ export class App {
 
     this.appState = new AppState();
     this.domManager = new DOMManager(canvas);
-    this.eventHandlers = new EventHandlers(this.appState, this.domManager);
+    this.propertiesPanel = new PropertiesPanel(this.appState, this.domManager);
+    this.eventHandlers = new EventHandlers(
+      this.appState,
+      this.domManager,
+      this.propertiesPanel
+    );
     this.contextMenu = new ContextMenu(this.appState, this.domManager);
     this.projectManager = new ProjectManager(this.appState, this.domManager);
     this.viewControls = new ViewControls(this.appState, this.domManager);
@@ -48,6 +55,9 @@ export class App {
       "contextmenu",
       this.eventHandlers.handleContextMenu
     );
+
+    // Prevent default drag behavior on canvas
+    canvas.addEventListener("dragstart", (e) => e.preventDefault());
 
     document.addEventListener("click", this.hideContextMenu);
 
@@ -88,18 +98,9 @@ export class App {
     const loadBtn = document.getElementById("loadBtn");
     const clearBtn = document.getElementById("clearBtn");
 
-    if (saveBtn)
-      saveBtn.addEventListener(
-        "click",
-        this.projectManager.saveProject.bind(this.projectManager)
-      );
-    if (loadBtn)
-      loadBtn.addEventListener(
-        "click",
-        this.projectManager.loadProject.bind(this.projectManager)
-      );
-    if (clearBtn)
-      clearBtn.addEventListener("click", this.clearCanvas.bind(this));
+    if (saveBtn) saveBtn.addEventListener("click", this.saveProject);
+    if (loadBtn) loadBtn.addEventListener("click", this.loadProject);
+    if (clearBtn) clearBtn.addEventListener("click", this.clearCanvas);
 
     const zoomInBtn = document.getElementById("zoomInBtn");
     const zoomOutBtn = document.getElementById("zoomOutBtn");
@@ -118,19 +119,28 @@ export class App {
     this.appState.contextMenuTarget = null;
   };
 
-  private clearCanvas(): void {
+  private saveProject = (): void => {
+    this.projectManager.saveProject();
+  };
+
+  private loadProject = (): void => {
+    this.projectManager.loadProject();
+  };
+
+  private clearCanvas = (): void => {
     if (
       confirm(
         "Are you sure you want to clear the canvas? This action cannot be undone."
       )
     ) {
       this.appState.clear();
+      this.propertiesPanel.updatePanel(null);
       document
         .querySelectorAll(".connection-svg")
         .forEach((conn) => conn.remove());
       this.render();
     }
-  }
+  };
 
   private updateStatus(): void {
     const modeText: Record<Mode, string> = {
@@ -171,5 +181,18 @@ export class App {
 
   public getDOMManager(): DOMManager {
     return this.domManager;
+  }
+
+  // Public methods to expose for global access if needed
+  public saveProjectPublic(): void {
+    this.saveProject();
+  }
+
+  public loadProjectPublic(): void {
+    this.loadProject();
+  }
+
+  public clearCanvasPublic(): void {
+    this.clearCanvas();
   }
 }

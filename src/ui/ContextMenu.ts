@@ -29,6 +29,7 @@ export class ContextMenu {
       this.appState.addElement(newElement);
       this.domManager.createElementDOM(newElement);
       this.appState.selectElement(newElement);
+      // this.domManager.updatePropertyPanel(newElement);
       this.render();
     }
     this.hideContextMenu();
@@ -50,27 +51,40 @@ export class ContextMenu {
     const element = this.appState.getElementById(id);
     if (!element) return;
 
+    // Remove from parent's children array
     if (element.parent) {
       element.parent.children = element.parent.children.filter(
         (child) => child.id !== id
       );
     }
 
+    // Recursively delete all children
     element.children.forEach((child) => {
       this.deleteElementById(child.id);
     });
 
+    // Remove all connections involving this element
     this.appState.connections = this.appState.connections.filter(
       (conn) => conn.from.id !== id && conn.to.id !== id
     );
 
+    // Remove DOM element
     if (element.domElement) {
       element.domElement.remove();
     }
+
+    // Remove from app state
     this.appState.removeElement(id);
 
+    // Clear selection if this element was selected
     if (this.appState.selectedElement?.id === id) {
       this.appState.selectedElement = null;
+      // this.domManager.clearPropertyPanel();
+    }
+
+    // Clear connection start if this element was the connection start
+    if (this.appState.connectionStart?.id === id) {
+      this.appState.connectionStart = null;
     }
 
     this.render();

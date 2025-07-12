@@ -38,13 +38,17 @@ export class DOMManager {
     }
   }
 
+  public updateElementTextContent(element: Element): void {
+    if (element.domElement) {
+      element.domElement.textContent = element.text;
+    }
+  }
+
   public editElementText(element: Element): void {
     const newText = prompt("Edit element text:", element.text);
     if (newText !== null) {
       element.text = newText;
-      if (element.domElement) {
-        element.domElement.textContent = newText;
-      }
+      this.updateElementTextContent(element);
     }
   }
 
