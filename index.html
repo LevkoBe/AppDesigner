@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Application Designer</title>
     <link rel="stylesheet" href="./styles/index.css" />
+    <link rel="stylesheet" href="./styles/bars.css" />
   </head>
   <body>
     <div class="container">
-      <div class="toolbar">
+      <div class="bar" id="toolbar">
         <h2>Application Designer</h2>
 
         <div class="mode-section">
@@ -58,6 +59,30 @@
         <div class="canvas" id="canvas"></div>
         <div class="status" id="status">Ready - Create/Child Mode</div>
       </div>
+
+      <div class="hidden bar" id="editbar">
+        <h2>Element Properties</h2>
+        <div id="readonlyProps">
+          <div id="readonlyPropTemplate" class="readonlyProp">
+            <strong class="propLabel">Readonly property</strong>:
+            <span class="propValue">[no element selected]</span>
+          </div>
+        </div>
+
+        <div id="inputFields">
+          <div id="inputFieldTemplate" class="inputField">
+            <label
+              ><span class="propLabel">Input</span>:
+              <input
+                type="text"
+                name="template"
+                class="propInput"
+                placeholder="[no element selected]"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="context-menu" id="contextMenu">
@@ -69,33 +94,7 @@
       <div class="context-menu-item" onclick="deleteElement()">Delete</div>
     </div>
 
-    <div class="edit-overlay" id="editOverlay">
-      <div class="edit-field">
-        <label>Text:</label>
-        <input type="text" id="editText" />
-      </div>
-      <div class="edit-field">
-        <label>Width:</label>
-        <input type="number" id="editWidth" />
-      </div>
-      <div class="edit-field">
-        <label>Height:</label>
-        <input type="number" id="editHeight" />
-      </div>
-      <div class="edit-field">
-        <label>X Position:</label>
-        <input type="number" id="editX" />
-      </div>
-      <div class="edit-field">
-        <label>Y Position:</label>
-        <input type="number" id="editY" />
-      </div>
-      <div class="edit-buttons">
-        <div class="edit-btn" onclick="cancelEdit()">Cancel</div>
-        <div class="edit-btn primary" onclick="saveEdit()">Save</div>
-      </div>
-    </div>
-
+    <script src="/src/customHTML/dropdown.ts"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

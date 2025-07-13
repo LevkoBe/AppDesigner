@@ -12,24 +12,6 @@ body {
   height: 100vh;
 }
 
-.toolbar {
-  width: 250px;
-  overflow: auto;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  padding: 20px;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-}
-
-.toolbar h2 {
-  margin: 0 0 20px 0;
-  font-size: 18px;
-  color: #ffffff;
-  text-align: center;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-  padding-bottom: 10px;
-}
-
 .mode-section {
   margin-bottom: 30px;
 }
@@ -128,10 +110,6 @@ body {
 
 .canvas.connection-mode {
   cursor: crosshair;
-}
-
-.canvas.edit-mode {
-  cursor: pointer;
 }
 
 .element {
@@ -290,72 +268,6 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.edit-overlay {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  padding: 15px;
-  min-width: 250px;
-  z-index: 10000;
+.hidden {
   display: none;
-}
-
-.edit-field {
-  margin-bottom: 10px;
-}
-
-.edit-field label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 12px;
-  color: #b8c6db;
-}
-
-.edit-field input,
-.edit-field textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 12px;
-}
-
-.edit-field input:focus,
-.edit-field textarea:focus {
-  outline: none;
-  border-color: #ffeb3b;
-}
-
-.edit-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.edit-btn {
-  padding: 6px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.2s ease;
-}
-
-.edit-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.edit-btn.primary {
-  background: rgba(76, 175, 80, 0.3);
-  border-color: rgba(76, 175, 80, 0.8);
-}
-
-.edit-btn.primary:hover {
-  background: rgba(76, 175, 80, 0.5);
 }
