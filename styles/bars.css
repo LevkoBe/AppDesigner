@@ -54,6 +54,57 @@ input:focus {
   font-family: sans-serif;
 }
 
+.customDropdown {
+  position: relative;
+  width: 100%;
+  margin: 8px 0;
+}
+.customDropdown .propLabel {
+  background-color: rgba(68, 68, 68, 0.25);
+  color: #eee;
+  padding: 8px 30px 8px 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+.customDropdown .propLabel::after {
+  content: "▼";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  pointer-events: none;
+}
+.propDrop {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #444;
+  border: 1px solid #555;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+.propOpt {
+  padding: 8px;
+  color: #eee;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.propOpt:hover {
+  background-color: #555;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
