@@ -1,0 +1,4 @@
+- all children should be rendered **_inside_** their parents.
+- feature of selecting everything in a rectangle (click-and-drag)
+- `class` property for custom styling
+- filtering by type, by flow, by entity
