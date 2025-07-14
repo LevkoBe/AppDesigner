@@ -40,11 +40,19 @@ export class App {
   private initializeApp(): void {
     this.setupEventListeners();
     this.domManager.updateCanvasCursor(this.appState.currentMode);
-    this.updateStatus();
+    this.domManager.updateStatus("Ready");
     this.render();
   }
 
   private setupEventListeners(): void {
+    this.setupCanvasEvents();
+    this.setupUIEvents();
+    this.setupContextMenuEvents();
+    this.setupProjectEvents();
+    this.setupViewControlEvents();
+  }
+
+  private setupCanvasEvents(): void {
     const canvas = document.getElementById("canvas") as HTMLElement;
 
     canvas.addEventListener("click", this.eventHandlers.handleCanvasClick);
@@ -55,12 +63,17 @@ export class App {
       "contextmenu",
       this.eventHandlers.handleContextMenu
     );
-
-    // Prevent default drag behavior on canvas
     canvas.addEventListener("dragstart", (e) => e.preventDefault());
 
     document.addEventListener("click", this.hideContextMenu);
+  }
 
+  private setupUIEvents(): void {
+    this.setupModeButtons();
+    this.setupElementTypeButtons();
+  }
+
+  private setupModeButtons(): void {
     document.querySelectorAll(".mode-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         document
@@ -71,7 +84,9 @@ export class App {
         this.eventHandlers.handleModeChange(mode);
       });
     });
+  }
 
+  private setupElementTypeButtons(): void {
     document.querySelectorAll(".element-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         document
@@ -82,7 +97,9 @@ export class App {
         this.eventHandlers.handleElementTypeChange(type);
       });
     });
+  }
 
+  private setupContextMenuEvents(): void {
     const editBtn = document.getElementById("editBtn");
     const duplicateBtn = document.getElementById("duplicateBtn");
     const deleteBtn = document.getElementById("deleteBtn");
@@ -93,15 +110,19 @@ export class App {
       duplicateBtn.addEventListener("click", this.contextMenu.duplicateElement);
     if (deleteBtn)
       deleteBtn.addEventListener("click", this.contextMenu.deleteElement);
+  }
 
+  private setupProjectEvents(): void {
     const saveBtn = document.getElementById("saveBtn");
     const loadBtn = document.getElementById("loadBtn");
     const clearBtn = document.getElementById("clearBtn");
 
-    if (saveBtn) saveBtn.addEventListener("click", this.saveProject);
-    if (loadBtn) loadBtn.addEventListener("click", this.loadProject);
-    if (clearBtn) clearBtn.addEventListener("click", this.clearCanvas);
+    if (saveBtn) saveBtn.addEventListener("click", this.handleSaveProject);
+    if (loadBtn) loadBtn.addEventListener("click", this.handleLoadProject);
+    if (clearBtn) clearBtn.addEventListener("click", this.handleClearCanvas);
+  }
 
+  private setupViewControlEvents(): void {
     const zoomInBtn = document.getElementById("zoomInBtn");
     const zoomOutBtn = document.getElementById("zoomOutBtn");
     const resetViewBtn = document.getElementById("resetViewBtn");
@@ -119,15 +140,15 @@ export class App {
     this.appState.contextMenuTarget = null;
   };
 
-  private saveProject = (): void => {
+  private handleSaveProject = (): void => {
     this.projectManager.saveProject();
   };
 
-  private loadProject = (): void => {
+  private handleLoadProject = (): void => {
     this.projectManager.loadProject();
   };
 
-  private clearCanvas = (): void => {
+  private handleClearCanvas = (): void => {
     if (
       confirm(
         "Are you sure you want to clear the canvas? This action cannot be undone."
@@ -142,35 +163,6 @@ export class App {
     }
   };
 
-  private updateStatus(): void {
-    const modeText: Record<Mode, string> = {
-      create: "Create/Child Mode",
-      connection: "Connection Mode",
-      move: "Movement Mode",
-      edit: "Edit Mode",
-    };
-    const elementText: Record<ElementType, string> = {
-      collection: "Collections",
-      function: "Functions",
-      object: "Objects",
-      input: "Inputs",
-      output: "Outputs",
-    };
-
-    let statusText = `${modeText[this.appState.currentMode]} - ${
-      elementText[this.appState.currentElementType]
-    }`;
-
-    if (
-      this.appState.currentMode === "connection" &&
-      this.appState.connectionStart
-    ) {
-      statusText += " - Select target element";
-    }
-
-    this.domManager.updateStatus(statusText);
-  }
-
   private render(): void {
     this.domManager.updateConnections(this.appState.connections);
   }
@@ -183,16 +175,15 @@ export class App {
     return this.domManager;
   }
 
-  // Public methods to expose for global access if needed
-  public saveProjectPublic(): void {
-    this.saveProject();
+  public saveProject(): void {
+    this.handleSaveProject();
   }
 
-  public loadProjectPublic(): void {
-    this.loadProject();
+  public loadProject(): void {
+    this.handleLoadProject();
   }
 
-  public clearCanvasPublic(): void {
-    this.clearCanvas();
+  public clearCanvas(): void {
+    this.handleClearCanvas();
   }
 }

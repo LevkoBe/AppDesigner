@@ -1,6 +1,6 @@
 import { ElementType, ElementData } from "../types.ts";
 
-export class Element {
+export class AppElement {
   public id: number;
   public type: ElementType;
   public x: number;
@@ -8,8 +8,8 @@ export class Element {
   public text: string;
   public width: number;
   public height: number;
-  public parent: Element | null;
-  public children: Element[];
+  public parent: AppElement | null;
+  public children: AppElement[];
   public connections: Connection[];
   public domElement?: HTMLElement;
 
@@ -18,7 +18,7 @@ export class Element {
     x: number,
     y: number,
     text: string = "",
-    parent: Element | null = null
+    parent: AppElement | null = null
   ) {
     this.id = Date.now() + Math.random();
     this.type = type;
@@ -44,7 +44,7 @@ export class Element {
       input: "Input",
       output: "Output",
     };
-    return defaults[this.type] || "Element";
+    return defaults[this.type] || "AppElement";
   }
 
   private getDefaultWidth(): number {

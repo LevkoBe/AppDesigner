@@ -1,6 +1,6 @@
 import { AppState } from "../state/AppState.ts";
 import { DOMManager } from "./DOMManager.ts";
-import { Element } from "../models/Element.ts";
+import { AppElement } from "../models/Element.ts";
 
 export class ContextMenu {
   private appState: AppState;
@@ -20,7 +20,7 @@ export class ContextMenu {
 
   public duplicateElement = (): void => {
     if (this.appState.contextMenuTarget) {
-      const newElement = new Element(
+      const newElement = new AppElement(
         this.appState.contextMenuTarget.type,
         this.appState.contextMenuTarget.x + 20,
         this.appState.contextMenuTarget.y + 20,

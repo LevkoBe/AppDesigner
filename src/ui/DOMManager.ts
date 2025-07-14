@@ -1,4 +1,4 @@
-import { Element } from "../models/Element.ts";
+import { AppElement } from "../models/Element.ts";
 import { Connection } from "../models/Connection.ts";
 
 export class DOMManager {
@@ -8,7 +8,7 @@ export class DOMManager {
     this.canvas = canvas;
   }
 
-  public createElementDOM(element: Element): void {
+  public createElementDOM(element: AppElement): void {
     const div = document.createElement("div");
     div.className = `element ${element.type}`;
     if (element.parent) {
@@ -31,20 +31,20 @@ export class DOMManager {
     element.domElement = div;
   }
 
-  public updateElementPosition(element: Element): void {
+  public updateElementPosition(element: AppElement): void {
     if (element.domElement) {
       element.domElement.style.left = element.x + "px";
       element.domElement.style.top = element.y + "px";
     }
   }
 
-  public updateElementTextContent(element: Element): void {
+  public updateElementTextContent(element: AppElement): void {
     if (element.domElement) {
       element.domElement.textContent = element.text;
     }
   }
 
-  public editElementText(element: Element): void {
+  public editElementText(element: AppElement): void {
     const newText = prompt("Edit element text:", element.text);
     if (newText !== null) {
       element.text = newText;

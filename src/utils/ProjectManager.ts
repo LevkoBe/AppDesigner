@@ -1,6 +1,6 @@
 import { AppState } from "../state/AppState.ts";
 import { DOMManager } from "../ui/DOMManager.ts";
-import { Element } from "../models/Element.ts";
+import { AppElement } from "../models/Element.ts";
 import { Connection } from "../models/Connection.ts";
 import { ProjectData } from "../types.ts";
 
@@ -45,7 +45,7 @@ export class ProjectManager {
               this.clearCanvas();
 
               project.elements.forEach((elementData) => {
-                const element = new Element(
+                const element = new AppElement(
                   elementData.type,
                   elementData.x,
                   elementData.y,

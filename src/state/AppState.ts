@@ -1,20 +1,20 @@
-import { Element } from "../models/Element.ts";
+import { AppElement } from "../models/Element.ts";
 import { Connection } from "../models/Connection.ts";
 import { ElementType, Mode, Point } from "../types.ts";
 
 export class AppState {
   public currentMode: Mode = "create";
   public currentElementType: ElementType = "collection";
-  public elements: Element[] = [];
+  public elements: AppElement[] = [];
   public connections: Connection[] = [];
-  public selectedElement: Element | null = null;
+  public selectedElement: AppElement | null = null;
   public dragging: boolean = false;
   public dragOffset: Point = { x: 0, y: 0 };
-  public connectionStart: Element | null = null;
+  public connectionStart: AppElement | null = null;
   public zoom: number = 1;
   public pan: Point = { x: 0, y: 0 };
-  public contextMenuTarget: Element | null = null;
-  public editingElement: Element | null = null;
+  public contextMenuTarget: AppElement | null = null;
+  public editingElement: AppElement | null = null;
 
   public setMode(mode: Mode): void {
     this.currentMode = mode;
@@ -24,7 +24,7 @@ export class AppState {
     this.currentElementType = type;
   }
 
-  public addElement(element: Element): void {
+  public addElement(element: AppElement): void {
     this.elements.push(element);
   }
 
@@ -46,11 +46,11 @@ export class AppState {
     }
   }
 
-  public getElementById(id: number): Element | undefined {
+  public getElementById(id: number): AppElement | undefined {
     return this.elements.find((e) => e.id === id);
   }
 
-  public getElementAt(x: number, y: number): Element | undefined {
+  public getElementAt(x: number, y: number): AppElement | undefined {
     return this.elements.find((element) => {
       return (
         x >= element.x &&
@@ -61,7 +61,7 @@ export class AppState {
     });
   }
 
-  public selectElement(element: Element | null): void {
+  public selectElement(element: AppElement | null): void {
     if (this.selectedElement?.domElement) {
       this.selectedElement.domElement.classList.remove("selected");
     }

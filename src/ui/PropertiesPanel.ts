@@ -1,6 +1,6 @@
 import { AppState } from "../state/AppState.ts";
 import { DOMManager } from "./DOMManager.ts";
-import { Element } from "../models/Element.ts";
+import { AppElement } from "../models/Element.ts";
 
 export class PropertiesPanel {
   private appState: AppState;
@@ -55,7 +55,7 @@ export class PropertiesPanel {
     return clone.querySelector(keyelementClass)! as HTMLElement;
   }
 
-  public updatePanel = (element: Element | null): void => {
+  public updatePanel = (element: AppElement | null): void => {
     if (!element) {
       this.panelContainer.classList.add("hidden");
       return;
@@ -69,7 +69,7 @@ export class PropertiesPanel {
     this.yField.textContent = Math.round(element.y).toString();
   };
 
-  public updatePosition(element: Element): void {
+  public updatePosition(element: AppElement): void {
     if (this.appState.selectedElement === element) {
       this.xField.textContent = Math.round(element.x).toString();
       this.yField.textContent = Math.round(element.y).toString();
