@@ -1,11 +1,17 @@
 import { App } from "./App.ts";
 
+declare global {
+  interface Window {
+    app: App;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   try {
     const app = new App();
 
     // available globally for debugging
-    (window as any).app = app;
+    window.app = app;
 
     console.log("Application initialized successfully");
   } catch (error) {
