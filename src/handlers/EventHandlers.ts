@@ -5,16 +5,13 @@ import { Mode, ElementType } from "../types.ts";
 import { ElementUtilities } from "./ElementUtilities.ts";
 
 import { handleCanvasClick } from "./CanvasClickHandler.ts";
-import {
-  handleMouseDown,
-  handleMouseMove,
-  handleMouseUp,
-} from "./MouseHandlers.ts";
+import { MouseHandlers } from "./MouseHandlers.ts";
 import { handleContextMenu } from "./ContextMenuHandler.ts";
 import { handleElementTypeChange, handleModeChange } from "./ModeHandlers.ts";
 
 export class EventHandlers {
   private utils: ElementUtilities;
+  private mouseHandler: MouseHandlers;
 
   constructor(
     private state: AppState,
@@ -22,18 +19,19 @@ export class EventHandlers {
     private panel: PropertiesPanel
   ) {
     this.utils = new ElementUtilities(state, dom, panel);
+    this.mouseHandler = new MouseHandlers(this.state, this.panel, this.dom);
   }
 
   public handleCanvasClick = (e: MouseEvent) =>
     handleCanvasClick(e, this.state, this.dom, this.panel, this.utils);
 
   public handleMouseDown = (e: MouseEvent) =>
-    handleMouseDown(e, this.state, this.dom, this.panel);
+    this.mouseHandler.handleMouseDown(e);
 
   public handleMouseMove = (e: MouseEvent) =>
-    handleMouseMove(e, this.state, this.dom, this.panel);
+    this.mouseHandler.handleMouseMove(e);
 
-  public handleMouseUp = () => handleMouseUp(this.state);
+  public handleMouseUp = () => this.mouseHandler.handleMouseUp();
 
   public handleContextMenu = (e: MouseEvent) =>
     handleContextMenu(e, this.state, this.dom);

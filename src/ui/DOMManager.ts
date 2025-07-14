@@ -8,6 +8,10 @@ export class DOMManager {
     this.canvas = canvas;
   }
 
+  public getCanvasRect(): DOMRect {
+    return this.canvas.getBoundingClientRect();
+  }
+
   public createElementDOM(element: AppElement): void {
     const div = document.createElement("div");
     div.className = `element ${element.type}`;
@@ -36,6 +40,7 @@ export class DOMManager {
       element.domElement.style.left = element.x + "px";
       element.domElement.style.top = element.y + "px";
     }
+    element.children.forEach((child) => this.updateElementPosition(child));
   }
 
   public updateElementTextContent(element: AppElement): void {

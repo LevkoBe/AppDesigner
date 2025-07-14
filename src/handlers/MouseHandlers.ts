@@ -1,70 +1,66 @@
-import { AppElement } from "../main.ts";
 import { AppState } from "../state/AppState.ts";
 import { DOMManager } from "../ui/DOMManager.ts";
 import { PropertiesPanel } from "../ui/PropertiesPanel.ts";
 
-export function handleMouseDown(
-  e: MouseEvent,
-  state: AppState,
-  dom: DOMManager,
-  panel: PropertiesPanel
-): void {
-  if (state.currentMode !== "move") return;
+/**
+ * Manages dragging of elements
+ */
+export class MouseHandlers {
+  constructor(
+    private state: AppState,
+    private panel: PropertiesPanel,
+    private dom: DOMManager
+  ) {}
 
-  const rect = (e.target as HTMLElement).getBoundingClientRect();
-  const x = (e.clientX - rect.left) / state.zoom - state.pan.x;
-  const y = (e.clientY - rect.top) / state.zoom - state.pan.y;
-  const element = state.getElementAt(x, y);
+  public handleMouseDown = (e: MouseEvent) => {
+    if (this.state.currentMode !== "move") return;
 
-  if (element) {
-    state.dragging = true;
-    state.selectElement(element);
-    panel.updatePanel(element);
-    state.dragOffset.x = x - element.x;
-    state.dragOffset.y = y - element.y;
-    element.domElement?.classList.add("dragging");
+    const rect = this.dom.getCanvasRect();
+    const x = (e.clientX - rect.left) / this.state.zoom - this.state.pan.x;
+    const y = (e.clientY - rect.top) / this.state.zoom - this.state.pan.y;
+    const element = this.state.getElementAt(x, y);
+
+    if (element) {
+      this.state.dragging = true;
+      this.state.selectElement(element);
+      this.panel.updatePanel(element);
+      this.state.dragOffset.x = x - element.x;
+      this.state.dragOffset.y = y - element.y;
+      element.domElement?.classList.add("dragging");
+      e.preventDefault();
+    }
+  };
+
+  public handleMouseMove = (e: MouseEvent) => {
+    if (
+      !this.state.dragging ||
+      !this.state.selectedElement ||
+      this.state.currentMode !== "move"
+    )
+      return;
+
+    const rect = this.dom.getCanvasRect();
+    const x = (e.clientX - rect.left) / this.state.zoom - this.state.pan.x;
+    const y = (e.clientY - rect.top) / this.state.zoom - this.state.pan.y;
+
+    const newX = x - this.state.dragOffset.x;
+    const newY = y - this.state.dragOffset.y;
+
+    this.state.selectedElement.x = newX;
+    this.state.selectedElement.y = newY;
+
+    this.dom.updateElementPosition(this.state.selectedElement);
+    this.panel.updatePosition(this.state.selectedElement);
+
+    this.dom.updateConnections(this.state.connections);
+
     e.preventDefault();
-  }
-}
+  };
 
-export function handleMouseMove(
-  e: MouseEvent,
-  state: AppState,
-  dom: DOMManager,
-  panel: PropertiesPanel
-): void {
-  if (!state.dragging || !state.selectedElement || state.currentMode !== "move")
-    return;
-
-  const rect = (e.target as HTMLElement).getBoundingClientRect();
-  const x = (e.clientX - rect.left) / state.zoom - state.pan.x;
-  const y = (e.clientY - rect.top) / state.zoom - state.pan.y;
-
-  const newX = x - state.dragOffset.x;
-  const newY = y - state.dragOffset.y;
-
-  state.selectedElement.x = newX;
-  state.selectedElement.y = newY;
-
-  dom.updateElementPosition(state.selectedElement);
-  panel.updatePosition(state.selectedElement);
-
-  updateChildrenRecursive(state.selectedElement, dom);
-  dom.updateConnections(state.connections);
-
-  e.preventDefault();
-}
-
-function updateChildrenRecursive(element: AppElement, dom: DOMManager) {
-  element.children.forEach((child) => {
-    dom.updateElementPosition(child);
-    updateChildrenRecursive(child, dom);
-  });
-}
-
-export function handleMouseUp(state: AppState): void {
-  if (state.dragging && state.selectedElement) {
-    state.dragging = false;
-    state.selectedElement.domElement?.classList.remove("dragging");
-  }
+  public handleMouseUp = () => {
+    if (this.state.dragging && this.state.selectedElement) {
+      this.state.dragging = false;
+      this.state.selectedElement.domElement?.classList.remove("dragging");
+    }
+  };
 }
