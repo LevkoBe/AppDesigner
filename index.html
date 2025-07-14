@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Application Designer</title>
-    <script type="module" crossorigin src="/AppDesigner/assets/index-CjMCzM-z.js"></script>
-    <link rel="stylesheet" crossorigin href="/AppDesigner/assets/index-zAl1NWSM.css">
+    <script type="module" crossorigin src="/AppDesigner/assets/index-CsoAMoti.js"></script>
+    <link rel="stylesheet" crossorigin href="/AppDesigner/assets/index-nC-PZcIi.css">
   </head>
   <body>
     <div class="container">
       <div class="bar" id="toolbar">
         <h2>Application Designer</h2>
 
-        <div class="mode-section">
+        <div id="modeSelection" class="section">
           <h3>Interaction Mode</h3>
           <div class="mode-buttons">
             <div class="mode-btn active" data-mode="create">Create / Child</div>
@@ -22,16 +22,16 @@
           </div>
         </div>
 
-        <div class="mode-section">
+        <div id="elementTypeSelection" class="section">
           <h3>Element Types</h3>
           <div class="element-buttons">
-            <div class="element-btn active" data-type="collection">
+            <div class="element-btn" data-type="collection">
               [Collections] - Rectangles
             </div>
             <div class="element-btn" data-type="function">
               (Functions) - Ovals
             </div>
-            <div class="element-btn" data-type="object">
+            <div class="element-btn active" data-type="object">
               {Objects} - Polygons
             </div>
             <div class="element-btn" data-type="input">&gt;Inputs&lt;</div>
@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <div class="mode-section">
+        <div class="section">
           <h3>Actions</h3>
           <div class="mode-buttons">
             <div class="mode-btn" id="saveBtn">Save Project</div>
