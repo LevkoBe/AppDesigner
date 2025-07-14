@@ -13,7 +13,7 @@ export function handleModeChange(
   dom.updateCanvasCursor(mode);
   utils.updateStatus();
 
-  if (mode !== "connection") {
+  if (mode !== "connect") {
     utils.resetConnectionState();
   }
 

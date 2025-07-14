@@ -4,7 +4,7 @@ export type ElementType =
   | "object"
   | "input"
   | "output";
-export type Mode = "create" | "connection" | "move" | "edit";
+export type Mode = "create" | "connect" | "move" | "edit";
 
 export interface ElementData {
   id: number;
