@@ -53,10 +53,10 @@ export class AppState {
   public getElementAt(x: number, y: number): AppElement | undefined {
     return this.elements.find((element) => {
       return (
-        x >= element.x &&
-        x <= element.x + element.width &&
-        y >= element.y &&
-        y <= element.y + element.height
+        x >= element.cornerX &&
+        x <= element.cornerX + element.width &&
+        y >= element.cornerY &&
+        y <= element.cornerY + element.height
       );
     });
   }

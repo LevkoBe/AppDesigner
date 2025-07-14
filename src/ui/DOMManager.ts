@@ -19,8 +19,8 @@ export class DOMManager {
       div.classList.add("has-parent");
     }
 
-    div.style.left = element.x + "px";
-    div.style.top = element.y + "px";
+    div.style.left = element.cornerX + "px";
+    div.style.top = element.cornerY + "px";
     div.style.width = element.width + "px";
     div.style.height = element.height + "px";
     div.textContent = element.text;
@@ -37,8 +37,8 @@ export class DOMManager {
 
   public updateElementPosition(element: AppElement): void {
     if (element.domElement) {
-      element.domElement.style.left = element.x + "px";
-      element.domElement.style.top = element.y + "px";
+      element.domElement.style.left = element.cornerX + "px";
+      element.domElement.style.top = element.cornerY + "px";
     }
     element.children.forEach((child) => this.updateElementPosition(child));
   }
@@ -65,10 +65,10 @@ export class DOMManager {
     svg.style.zIndex = "1";
     svg.style.overflow = "visible";
 
-    const fromX = connection.from.x + connection.from.width / 2;
-    const fromY = connection.from.y + connection.from.height / 2;
-    const toX = connection.to.x + connection.to.width / 2;
-    const toY = connection.to.y + connection.to.height / 2;
+    const fromX = connection.from.centerX;
+    const fromY = connection.from.centerY;
+    const toX = connection.to.centerX;
+    const toY = connection.to.centerY;
 
     const minX = Math.min(fromX, toX) - 20;
     const minY = Math.min(fromY, toY) - 20;

@@ -22,8 +22,8 @@ export class ContextMenu {
     if (this.appState.contextMenuTarget) {
       const newElement = new AppElement(
         this.appState.contextMenuTarget.type,
-        this.appState.contextMenuTarget.x + 20,
-        this.appState.contextMenuTarget.y + 20,
+        this.appState.contextMenuTarget.centerX + 20,
+        this.appState.contextMenuTarget.centerY + 20,
         this.appState.contextMenuTarget.text
       );
       this.appState.addElement(newElement);

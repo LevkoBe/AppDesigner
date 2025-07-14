@@ -33,8 +33,8 @@ export class ElementUtilities {
   }
 
   public createChildElement(parent: AppElement): AppElement {
-    const childX = parent.x + parent.width + 30;
-    const childY = parent.y + parent.children.length * 55;
+    const childX = parent.centerX + parent.width + 30;
+    const childY = parent.centerY + parent.children.length * 55;
     return this.createElementAt(childX, childY, parent);
   }
 

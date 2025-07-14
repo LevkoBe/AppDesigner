@@ -24,8 +24,8 @@ export class MouseHandlers {
       this.state.dragging = true;
       this.state.selectElement(element);
       this.panel.updatePanel(element);
-      this.state.dragOffset.x = x - element.x;
-      this.state.dragOffset.y = y - element.y;
+      this.state.dragOffset.x = x - element.cornerX;
+      this.state.dragOffset.y = y - element.cornerY;
       element.domElement?.classList.add("dragging");
       e.preventDefault();
     }
@@ -46,8 +46,7 @@ export class MouseHandlers {
     const newX = x - this.state.dragOffset.x;
     const newY = y - this.state.dragOffset.y;
 
-    this.state.selectedElement.x = newX;
-    this.state.selectedElement.y = newY;
+    this.state.selectedElement.updateCorner(newX, newY);
 
     this.dom.updateElementPosition(this.state.selectedElement);
     this.panel.updatePosition(this.state.selectedElement);

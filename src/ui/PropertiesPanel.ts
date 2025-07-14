@@ -65,14 +65,15 @@ export class PropertiesPanel {
     this.idField.textContent = element.id.toString();
     this.typeField.textContent = element.type;
     this.textInput.value = element.text;
-    this.xField.textContent = Math.round(element.x).toString();
-    this.yField.textContent = Math.round(element.y).toString();
+    this.xField.textContent = Math.round(element.centerX).toString();
+    this.yField.textContent = Math.round(element.centerY).toString();
   };
 
   public updatePosition(element: AppElement): void {
     if (this.appState.selectedElement === element) {
-      this.xField.textContent = Math.round(element.x).toString();
-      this.yField.textContent = Math.round(element.y).toString();
+      const center = element.getCenter();
+      this.xField.textContent = Math.round(center.x).toString();
+      this.yField.textContent = Math.round(center.y).toString();
     }
   }
 

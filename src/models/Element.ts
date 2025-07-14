@@ -1,10 +1,9 @@
-import { ElementType, ElementData } from "../types.ts";
+import { ElementType, ElementData, Point } from "../types.ts";
+import { Connection } from "./Connection.ts";
 
 export class AppElement {
   public id: number;
   public type: ElementType;
-  public x: number;
-  public y: number;
   public text: string;
   public width: number;
   public height: number;
@@ -13,20 +12,23 @@ export class AppElement {
   public connections: Connection[];
   public domElement?: HTMLElement;
 
+  private _centerX: number;
+  private _centerY: number;
+
   constructor(
     type: ElementType,
-    x: number,
-    y: number,
+    centerX: number,
+    centerY: number,
     text: string = "",
     parent: AppElement | null = null
   ) {
     this.id = Date.now() + Math.random();
     this.type = type;
-    this.x = x;
-    this.y = y;
     this.text = text || this.getDefaultText();
     this.width = this.getDefaultWidth();
     this.height = this.getDefaultHeight();
+    this._centerX = centerX;
+    this._centerY = centerY;
     this.parent = parent;
     this.children = [];
     this.connections = [];
@@ -34,6 +36,36 @@ export class AppElement {
     if (parent) {
       parent.children.push(this);
     }
+  }
+
+  public get centerX(): number {
+    return this._centerX;
+  }
+
+  public get centerY(): number {
+    return this._centerY;
+  }
+
+  public get cornerX(): number {
+    return this._centerX - this.width / 2;
+  }
+
+  public get cornerY(): number {
+    return this._centerY - this.height / 2;
+  }
+
+  public getCenter(): Point {
+    return { x: this._centerX, y: this._centerY };
+  }
+
+  public updateCenter(x: number, y: number): void {
+    this._centerX = x;
+    this._centerY = y;
+  }
+
+  public updateCorner(x: number, y: number): void {
+    this._centerX = x + this.width / 2;
+    this._centerY = y + this.height / 2;
   }
 
   private getDefaultText(): string {
@@ -73,8 +105,8 @@ export class AppElement {
     return {
       id: this.id,
       type: this.type,
-      x: this.x,
-      y: this.y,
+      x: this.centerX,
+      y: this.centerY,
       text: this.text,
       width: this.width,
       height: this.height,
@@ -84,5 +116,3 @@ export class AppElement {
     };
   }
 }
-
-import { Connection } from "./Connection.ts";
