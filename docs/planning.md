@@ -1,4 +1,5 @@
 - all children should be rendered **_inside_** their parents.
+- moving an element _onto_ another should place it **_inside_**, i.e. make it a _child_ of that element
 - feature of selecting everything in a rectangle (click-and-drag)
 - `class` property for custom styling
 - filtering by type, by flow, by entity

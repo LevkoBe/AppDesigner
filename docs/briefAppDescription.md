@@ -1,4 +1,7 @@
 **Application Designer – Core Specification**
+
+> **Live Demo**: https://levkobe.github.io/AppDesigner/
+
 The **Application Designer** consists of a few main element types:
 
 - **{Objects}**: Can represent a class, a system, or an argument.
