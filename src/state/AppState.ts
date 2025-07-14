@@ -4,7 +4,7 @@ import { ElementType, Mode, Point } from "../types.ts";
 
 export class AppState {
   public currentMode: Mode = "create";
-  public currentElementType: ElementType = "collection";
+  public currentElementType: ElementType = "object";
   public elements: AppElement[] = [];
   public connections: Connection[] = [];
   public selectedElement: AppElement | null = null;

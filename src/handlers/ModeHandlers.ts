@@ -16,6 +16,12 @@ export function handleModeChange(
   if (mode !== "connection") {
     utils.resetConnectionState();
   }
+
+  if (mode === "create") {
+    dom.showElementTypeSelection();
+  } else {
+    dom.hideElementTypeSelection();
+  }
 }
 
 export function handleElementTypeChange(

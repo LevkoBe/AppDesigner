@@ -106,15 +106,25 @@ export class DOMManager {
     if (contextMenu) {
       contextMenu.style.left = x + "px";
       contextMenu.style.top = y + "px";
-      contextMenu.style.display = "block";
+      contextMenu.classList.remove("hidden");
     }
   }
 
   public hideContextMenu(): void {
     const contextMenu = document.getElementById("contextMenu");
     if (contextMenu) {
-      contextMenu.style.display = "none";
+      contextMenu.classList.add("hidden");
     }
+  }
+
+  public showElementTypeSelection(): void {
+    const selector = document.getElementById("elementTypeSelection");
+    if (selector) selector.classList.remove("hidden");
+  }
+
+  public hideElementTypeSelection(): void {
+    const selector = document.getElementById("elementTypeSelection");
+    if (selector) selector.classList.add("hidden");
   }
 
   public updateCanvasCursor(mode: string): void {

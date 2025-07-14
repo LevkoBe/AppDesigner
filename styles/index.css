@@ -12,11 +12,11 @@ body {
   height: 100vh;
 }
 
-.mode-section {
+.section {
   margin-bottom: 30px;
 }
 
-.mode-section h3 {
+.section h3 {
   margin: 0 0 10px 0;
   font-size: 14px;
   color: #b8c6db;
@@ -224,7 +224,6 @@ body {
   min-width: 150px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   z-index: 10000;
-  display: none;
 }
 
 .context-menu-item {
@@ -269,5 +268,5 @@ body {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }

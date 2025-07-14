@@ -103,9 +103,9 @@ export class ElementUtilities {
       output: "Outputs",
     };
 
-    let statusText = `${modeText[this.state.currentMode]} - ${
-      elementText[this.state.currentElementType]
-    }`;
+    let statusText = `${modeText[this.state.currentMode]}`;
+    if (this.state.currentMode === "create")
+      statusText += ` - ${elementText[this.state.currentElementType]}`;
 
     if (this.state.currentMode === "connection" && this.state.connectionStart) {
       statusText += " - Select target element";
