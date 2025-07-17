@@ -68,6 +68,12 @@ export class AppElement {
     this._centerY = y + this.height / 2;
   }
 
+  // New method to allow layout systems to update position
+  public setCenter(x: number, y: number): void {
+    this._centerX = x;
+    this._centerY = y;
+  }
+
   private getDefaultText(): string {
     const defaults: Record<ElementType, string> = {
       collection: "Collection",

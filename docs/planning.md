@@ -3,3 +3,6 @@
 - feature of selecting everything in a rectangle (click-and-drag)
 - `class` property for custom styling
 - filtering by type, by flow, by entity
+- movement via middle mouse, ?and in move mode via right mouse?
+- retrieve notes from phone
+- scroll for zoom

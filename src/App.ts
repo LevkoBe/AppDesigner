@@ -6,6 +6,7 @@ import { ProjectManager } from "./utils/ProjectManager.ts";
 import { Mode, ElementType } from "./types.ts";
 import { ViewControls } from "./ui/ViewControls.ts";
 import { PropertiesPanel } from "./ui/PropertiesPanel.ts";
+import { ForceDirectedLayout } from "./layout/ForceDirectedLayout.ts";
 
 export class App {
   private appState: AppState;
@@ -15,6 +16,7 @@ export class App {
   private projectManager: ProjectManager;
   private viewControls: ViewControls;
   private propertiesPanel: PropertiesPanel;
+  private forceDirectedLayout: ForceDirectedLayout;
 
   constructor() {
     const canvas = document.getElementById("canvas") as HTMLElement;
@@ -33,6 +35,7 @@ export class App {
     this.contextMenu = new ContextMenu(this.appState, this.domManager);
     this.projectManager = new ProjectManager(this.appState, this.domManager);
     this.viewControls = new ViewControls(this.appState, this.domManager);
+    this.forceDirectedLayout = new ForceDirectedLayout();
 
     this.initializeApp();
   }
@@ -50,6 +53,7 @@ export class App {
     this.setupContextMenuEvents();
     this.setupProjectEvents();
     this.setupViewControlEvents();
+    this.setupLayoutEvents();
   }
 
   private setupCanvasEvents(): void {
@@ -135,6 +139,18 @@ export class App {
       resetViewBtn.addEventListener("click", this.viewControls.resetView);
   }
 
+  private setupLayoutEvents(): void {
+    const layoutBtn = document.getElementById("layoutBtn");
+    const stopLayoutBtn = document.getElementById("stopLayoutBtn");
+
+    if (layoutBtn) {
+      layoutBtn.addEventListener("click", this.handleStartLayout);
+    }
+    if (stopLayoutBtn) {
+      stopLayoutBtn.addEventListener("click", this.handleStopLayout);
+    }
+  }
+
   private hideContextMenu = (): void => {
     this.domManager.hideContextMenu();
     this.appState.contextMenuTarget = null;
@@ -154,6 +170,7 @@ export class App {
         "Are you sure you want to clear the canvas? This action cannot be undone."
       )
     ) {
+      this.forceDirectedLayout.stop();
       this.appState.clear();
       this.propertiesPanel.updatePanel(null);
       document
@@ -161,6 +178,17 @@ export class App {
         .forEach((conn) => conn.remove());
       this.render();
     }
+  };
+
+  private handleStartLayout = (): void => {
+    this.forceDirectedLayout.start(
+      this.appState.elements,
+      this.appState.connections
+    );
+  };
+
+  private handleStopLayout = (): void => {
+    this.forceDirectedLayout.stop();
   };
 
   private render(): void {
@@ -175,6 +203,10 @@ export class App {
     return this.domManager;
   }
 
+  public getForceDirectedLayout(): ForceDirectedLayout {
+    return this.forceDirectedLayout;
+  }
+
   public saveProject(): void {
     this.handleSaveProject();
   }
@@ -185,5 +217,13 @@ export class App {
 
   public clearCanvas(): void {
     this.handleClearCanvas();
+  }
+
+  public startLayout(): void {
+    this.handleStartLayout();
+  }
+
+  public stopLayout(): void {
+    this.handleStopLayout();
   }
 }
