@@ -1,34 +1,28 @@
-import { ElementType, ElementData, Point } from "../types.ts";
+import { ElementType, ElementData } from "../types.ts";
 import { Connection } from "./Connection.ts";
 
 export class AppElement {
-  public id: number;
-  public type: ElementType;
+  public id: string;
   public text: string;
   public width: number;
   public height: number;
-  public parent: AppElement | null;
   public children: AppElement[];
   public connections: Connection[];
   public domElement?: HTMLElement;
 
-  private _centerX: number;
-  private _centerY: number;
-
   constructor(
-    type: ElementType,
-    centerX: number,
-    centerY: number,
-    text: string = "",
-    parent: AppElement | null = null
+    public type: ElementType,
+    public x: number,
+    public y: number,
+    public parent: AppElement | null = null
   ) {
-    this.id = Date.now() + Math.random();
+    this.id = (Date.now() + Math.random()).toString();
     this.type = type;
-    this.text = text || this.getDefaultText();
+    this.text = this.getDefaultText();
     this.width = this.getDefaultWidth();
     this.height = this.getDefaultHeight();
-    this._centerX = centerX;
-    this._centerY = centerY;
+    this.x = x;
+    this.y = y;
     this.parent = parent;
     this.children = [];
     this.connections = [];
@@ -38,40 +32,20 @@ export class AppElement {
     }
   }
 
+  // redundant
   public get centerX(): number {
-    return this._centerX;
+    return this.x;
   }
-
   public get centerY(): number {
-    return this._centerY;
+    return this.y;
   }
 
   public get cornerX(): number {
-    return this._centerX - this.width / 2;
+    return this.x - this.width / 2;
   }
 
   public get cornerY(): number {
-    return this._centerY - this.height / 2;
-  }
-
-  public getCenter(): Point {
-    return { x: this._centerX, y: this._centerY };
-  }
-
-  public updateCenter(x: number, y: number): void {
-    this._centerX = x;
-    this._centerY = y;
-  }
-
-  public updateCorner(x: number, y: number): void {
-    this._centerX = x + this.width / 2;
-    this._centerY = y + this.height / 2;
-  }
-
-  // New method to allow layout systems to update position
-  public setCenter(x: number, y: number): void {
-    this._centerX = x;
-    this._centerY = y;
+    return this.y - this.height / 2;
   }
 
   private getDefaultText(): string {
@@ -116,9 +90,9 @@ export class AppElement {
       text: this.text,
       width: this.width,
       height: this.height,
-      parent: this.parent ? this.parent.id : null,
-      children: this.children.map((child) => child.id),
-      connections: this.connections.map((conn) => conn.id),
+      parentId: this.parent ? this.parent.id : null,
+      childIds: this.children.map((child) => child.id),
+      connectionIds: this.connections.map((conn) => conn.id),
     };
   }
 }

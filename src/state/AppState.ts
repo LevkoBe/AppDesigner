@@ -28,7 +28,7 @@ export class AppState {
     this.elements.push(element);
   }
 
-  public removeElement(id: number): void {
+  public removeElement(id: string): void {
     const index = this.elements.findIndex((e) => e.id === id);
     if (index !== -1) {
       this.elements.splice(index, 1);
@@ -39,14 +39,14 @@ export class AppState {
     this.connections.push(connection);
   }
 
-  public removeConnection(id: number): void {
+  public removeConnection(id: string): void {
     const index = this.connections.findIndex((c) => c.id === id);
     if (index !== -1) {
       this.connections.splice(index, 1);
     }
   }
 
-  public getElementById(id: number): AppElement | undefined {
+  public getElementById(id: string): AppElement | undefined {
     return this.elements.find((e) => e.id === id);
   }
 
@@ -71,17 +71,20 @@ export class AppState {
     }
   }
 
-  public clear(): void {
-    this.elements.forEach((element) => {
-      if (element.domElement) {
-        element.domElement.remove();
-      }
+  serialize(): string {
+    return JSON.stringify({
+      elements: this.elements.map((e) => e.serialize()),
+      connections: this.connections.map((c) => c.serialize()),
     });
-    this.elements = [];
-    this.connections = [];
-    this.selectedElement = null;
-    this.connectionStart = null;
-    this.contextMenuTarget = null;
-    this.editingElement = null;
+  }
+
+  deserialize(json: string): void {
+    const data = JSON.parse(json);
+    this.elements = data.elements.map(
+      (e: AppElement) => new AppElement(e.type, e.x, e.y, e.parent)
+    );
+    this.connections = data.connections.map(
+      (c: Connection) => new Connection(c.from, c.to)
+    );
   }
 }

@@ -2,12 +2,12 @@ import { AppElement } from "./Element.ts";
 import { ConnectionData } from "../types.ts";
 
 export class Connection {
-  public id: number;
+  public id: string;
   public from: AppElement;
   public to: AppElement;
 
   constructor(from: AppElement, to: AppElement) {
-    this.id = Date.now() + Math.random();
+    this.id = (Date.now() + Math.random()).toString();
     this.from = from;
     this.to = to;
 

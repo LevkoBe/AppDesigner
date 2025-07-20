@@ -1,15 +1,13 @@
-import { InputState } from "./InputInterpretationState.js";
-import { DiagramElement } from "./CoreModel.js";
+import { InputState } from "./InputState.js";
 import { Mode } from "fs";
 import { ElementType } from "./types.js";
+import { AppElement } from "./models/Element.js";
 
 export class InputLayer {
-  private dragStartPos = { x: 0, y: 0 };
-
   constructor(
     private canvas: HTMLCanvasElement,
     private inputState: InputState,
-    private getElementsCallback: () => DiagramElement[]
+    private getElementsCallback: () => AppElement[]
   ) {
     this.setupEventListeners();
   }
@@ -153,10 +151,10 @@ export class InputLayer {
   }
 
   private findElementAt(
-    elements: DiagramElement[],
+    elements: AppElement[],
     x: number,
     y: number
-  ): DiagramElement | undefined {
+  ): AppElement | undefined {
     for (let i = elements.length - 1; i >= 0; i--) {
       const el = elements[i];
       if (
@@ -169,14 +167,5 @@ export class InputLayer {
       }
     }
     return undefined;
-  }
-
-  public destroy(): void {
-    this.canvas.removeEventListener("click", this.handleClick);
-    this.canvas.removeEventListener("mousedown", this.handleMouseDown);
-    this.canvas.removeEventListener("mousemove", this.handleMouseMove);
-    this.canvas.removeEventListener("mouseup", this.handleMouseUp);
-    this.canvas.removeEventListener("dblclick", this.handleDoubleClick);
-    this.canvas.removeEventListener("contextmenu", this.handleContextMenu);
   }
 }
