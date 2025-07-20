@@ -91,23 +91,19 @@ export class InputLayer {
 
     if (
       this.inputState.isDragging &&
-      this.inputState.selectedElementId &&
+      this.inputState.activeId &&
       this.inputState.currentMode === "move"
     ) {
       const elements = this.getElementsCallback();
       const draggedElement = elements.find(
-        (el) => el.id === this.inputState.selectedElementId
+        (el) => el.id === this.inputState.activeId
       );
 
       if (draggedElement && this.inputState.dragOffset) {
         const newX = x - this.inputState.dragOffset.x;
         const newY = y - this.inputState.dragOffset.y;
 
-        this.inputState.interpretDrag(
-          this.inputState.selectedElementId,
-          newX,
-          newY
-        );
+        this.inputState.interpretDrag(this.inputState.activeId, newX, newY);
       }
 
       e.preventDefault();
@@ -132,8 +128,7 @@ export class InputLayer {
     e.preventDefault();
 
     const { x, y } = this.getCanvasCoordinates(e);
-    const elements = this.getElementsCallback();
-    const clickedElement = this.findElementAt(elements, x, y);
+    const clickedElement = this.findElementAt(this.getElementsCallback(), x, y);
 
     this.inputState.interpretContextMenu(x, y, clickedElement?.id);
   };

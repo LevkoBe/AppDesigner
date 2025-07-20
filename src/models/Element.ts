@@ -14,7 +14,7 @@ export class AppElement {
     public type: ElementType,
     public x: number,
     public y: number,
-    public parent: AppElement | null = null
+    public parent: AppElement | undefined = undefined
   ) {
     this.id = (Date.now() + Math.random()).toString();
     this.type = type;
@@ -90,7 +90,7 @@ export class AppElement {
       text: this.text,
       width: this.width,
       height: this.height,
-      parentId: this.parent ? this.parent.id : null,
+      parentId: this.parent ? this.parent.id : undefined,
       childIds: this.children.map((child) => child.id),
       connectionIds: this.connections.map((conn) => conn.id),
     };

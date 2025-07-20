@@ -9,22 +9,34 @@ export class ContextMenu {
   constructor(appState: AppState, domManager: DOMManager) {
     this.appState = appState;
     this.domManager = domManager;
+    this.setupContextMenuEvents();
+  }
+
+  private setupContextMenuEvents(): void {
+    document
+      .getElementById("editBtn")
+      ?.addEventListener("click", this.editElement);
+    document
+      .getElementById("duplicateBtn")
+      ?.addEventListener("click", this.duplicateElement);
+    document
+      .getElementById("deleteBtn")
+      ?.addEventListener("click", this.deleteElement);
   }
 
   public editElement = (): void => {
-    if (this.appState.contextMenuTarget) {
-      this.domManager.editElementText(this.appState.contextMenuTarget);
+    if (this.appState.selectedElement) {
+      this.domManager.editElementText(this.appState.selectedElement);
     }
     this.hideContextMenu();
   };
 
   public duplicateElement = (): void => {
-    if (this.appState.contextMenuTarget) {
+    if (this.appState.selectedElement) {
       const newElement = new AppElement(
-        this.appState.contextMenuTarget.type,
-        this.appState.contextMenuTarget.centerX + 20,
-        this.appState.contextMenuTarget.centerY + 20,
-        this.appState.contextMenuTarget.text
+        this.appState.selectedElement.type,
+        this.appState.selectedElement.centerX + 20,
+        this.appState.selectedElement.centerY + 20
       );
       this.appState.addElement(newElement);
       this.domManager.createElementDOM(newElement);
@@ -36,18 +48,18 @@ export class ContextMenu {
   };
 
   public deleteElement = (): void => {
-    if (this.appState.contextMenuTarget) {
-      this.deleteElementById(this.appState.contextMenuTarget.id);
+    if (this.appState.selectedElement) {
+      this.deleteElementById(this.appState.selectedElement.id);
     }
     this.hideContextMenu();
   };
 
   private hideContextMenu(): void {
-    this.domManager.hideContextMenu();
-    this.appState.contextMenuTarget = null;
+    // this.domManager.hideContextMenu();
+    this.appState.selectedElement = undefined;
   }
 
-  private deleteElementById(id: number): void {
+  private deleteElementById(id: string): void {
     const element = this.appState.getElementById(id);
     if (!element) return;
 
@@ -78,13 +90,13 @@ export class ContextMenu {
 
     // Clear selection if this element was selected
     if (this.appState.selectedElement?.id === id) {
-      this.appState.selectedElement = null;
+      this.appState.selectedElement = undefined;
       // this.domManager.clearPropertyPanel();
     }
 
     // Clear connection start if this element was the connection start
-    if (this.appState.connectionStart?.id === id) {
-      this.appState.connectionStart = null;
+    if (this.appState.fromElement?.id === id) {
+      this.appState.fromElement = undefined;
     }
 
     this.render();

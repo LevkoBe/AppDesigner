@@ -53,3 +53,9 @@ P { f:a->c g:c->b }
 
 **Priority:** Low–Medium
 **Tags:** enhancement, syntax, visualization, DSL
+
+### Shift styling & accessibility
+
+- Add description on Create/Delete button hovering
+- Add description on Connect/Disconnect button hovering
+- Change colors of buttons to red on Shift press

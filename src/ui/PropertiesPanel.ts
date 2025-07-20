@@ -55,7 +55,7 @@ export class PropertiesPanel {
     return clone.querySelector(keyelementClass)! as HTMLElement;
   }
 
-  public updatePanel = (element: AppElement | null): void => {
+  public updatePanel = (element: AppElement | undefined): void => {
     if (!element) {
       this.panelContainer.classList.add("hidden");
       return;

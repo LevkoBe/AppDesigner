@@ -7,14 +7,13 @@ export class AppState {
   public currentElementType: ElementType = "object";
   public elements: AppElement[] = [];
   public connections: Connection[] = [];
-  public selectedElement: AppElement | null = null;
+  public selectedElement: AppElement | undefined = undefined;
   public dragging: boolean = false;
   public dragOffset: Point = { x: 0, y: 0 };
-  public connectionStart: AppElement | null = null;
+  public fromElement: AppElement | undefined = undefined;
   public zoom: number = 1;
   public pan: Point = { x: 0, y: 0 };
-  public contextMenuTarget: AppElement | null = null;
-  public editingElement: AppElement | null = null;
+  public editingElement: AppElement | undefined = undefined;
 
   public setMode(mode: Mode): void {
     this.currentMode = mode;
@@ -61,7 +60,7 @@ export class AppState {
     });
   }
 
-  public selectElement(element: AppElement | null): void {
+  public selectElement(element: AppElement | undefined): void {
     if (this.selectedElement?.domElement) {
       this.selectedElement.domElement.classList.remove("selected");
     }

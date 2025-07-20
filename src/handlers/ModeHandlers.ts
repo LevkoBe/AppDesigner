@@ -14,7 +14,7 @@ export function handleModeChange(
   utils.updateStatus();
 
   if (mode !== "connect") {
-    utils.resetConnectionState();
+    // utils.resetConnectionState();
   }
 
   if (mode === "create") {

@@ -4,7 +4,6 @@ import { PropertiesPanel } from "../ui/PropertiesPanel.ts";
 import { Mode, ElementType } from "../types.ts";
 import { ElementUtilities } from "./ElementUtilities.ts";
 
-import { handleContextMenu } from "./ContextMenuHandler.ts";
 import { handleElementTypeChange, handleModeChange } from "./ModeHandlers.ts";
 import { ClickHandler } from "./CanvasClickHandler.ts";
 
@@ -17,7 +16,7 @@ export class EventHandlers {
     private dom: DOMManager,
     private panel: PropertiesPanel
   ) {
-    this.utils = new ElementUtilities(state, dom, panel);
+    this.utils = new ElementUtilities(state, dom);
     this.clickHandler = new ClickHandler(
       this.dom,
       this.panel,
@@ -36,9 +35,6 @@ export class EventHandlers {
     this.clickHandler.handleMouseMove(e);
 
   public handleMouseUp = () => this.clickHandler.handleMouseUp();
-
-  public handleContextMenu = (e: MouseEvent) =>
-    handleContextMenu(e, this.state, this.dom);
 
   public handleModeChange = (mode: Mode) =>
     handleModeChange(mode, this.state, this.dom, this.utils);

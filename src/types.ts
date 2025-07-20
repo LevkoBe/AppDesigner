@@ -27,7 +27,7 @@ export interface ElementData {
   text: string;
   width: number;
   height: number;
-  parentId: string | null;
+  parentId: string | undefined;
   childIds: string[];
   connectionIds: string[];
 }

@@ -16,7 +16,7 @@ export class ForceDirectedLayout {
   private config: ForceDirectedConfig;
   private velocities: Map<number, Point> = new Map();
   private isRunning: boolean = false;
-  private animationId: number | null = null;
+  private animationId: number | undefined = undefined;
 
   constructor(config: Partial<ForceDirectedConfig> = {}) {
     this.config = {
@@ -43,7 +43,7 @@ export class ForceDirectedLayout {
     this.isRunning = false;
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
-      this.animationId = null;
+      this.animationId = undefined;
     }
   }
 

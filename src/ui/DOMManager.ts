@@ -51,7 +51,7 @@ export class DOMManager {
 
   public editElementText(element: AppElement): void {
     const newText = prompt("Edit element text:", element.text);
-    if (newText !== null) {
+    if (newText !== undefined) {
       element.text = newText;
       this.updateElementTextContent(element);
     }
@@ -60,7 +60,7 @@ export class DOMManager {
   public createConnectionDOM(connection: Connection): void {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.classList.add("connection-svg");
-    svg.style.position = "absolute";
+    svg.style.mousePosition = "absolute";
     svg.style.pointerEvents = "none";
     svg.style.zIndex = "1";
     svg.style.overflow = "visible";
@@ -99,22 +99,6 @@ export class DOMManager {
     connections.forEach((connection) => {
       this.createConnectionDOM(connection);
     });
-  }
-
-  public showContextMenu(x: number, y: number): void {
-    const contextMenu = document.getElementById("contextMenu");
-    if (contextMenu) {
-      contextMenu.style.left = x + "px";
-      contextMenu.style.top = y + "px";
-      contextMenu.classList.remove("hidden");
-    }
-  }
-
-  public hideContextMenu(): void {
-    const contextMenu = document.getElementById("contextMenu");
-    if (contextMenu) {
-      contextMenu.classList.add("hidden");
-    }
   }
 
   public showElementTypeSelection(): void {
