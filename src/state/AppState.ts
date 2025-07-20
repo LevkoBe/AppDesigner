@@ -47,6 +47,12 @@ export class AppState {
     }
   }
 
+  removeConnectionsFor(id: string): void {
+    this.connections = this.connections.filter(
+      (conn) => conn.from.id !== id && conn.to.id !== id
+    );
+  }
+
   getElementById(id: string): AppElement | undefined {
     return this.elements.find((e) => e.id === id);
   }
