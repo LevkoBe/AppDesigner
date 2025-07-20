@@ -18,9 +18,9 @@ export class InputLayer {
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
     this.canvas.addEventListener("mouseup", this.handleMouseUp);
     this.canvas.addEventListener("dblclick", this.handleDoubleClick);
-    this.canvas.addEventListener("contextmenu", this.handleContextMenu);
     this.setupModeButtons();
     this.setupElementTypeButtons();
+    this.setupContextMenuEvents();
   }
 
   private setupModeButtons(): void {
@@ -49,6 +49,26 @@ export class InputLayer {
         if (type) this.inputState.elementType = type;
       });
     });
+  }
+
+  private setupContextMenuEvents(): void {
+    document
+      .getElementById("editBtn")
+      ?.addEventListener("click", () =>
+        this.inputState.interpretContextMenuOption("edit")
+      );
+    document
+      .getElementById("duplicateBtn")
+      ?.addEventListener("click", () =>
+        this.inputState.interpretContextMenuOption("duplicate")
+      );
+    document
+      .getElementById("deleteBtn")
+      ?.addEventListener("click", () =>
+        this.inputState.interpretContextMenuOption("delete")
+      );
+
+    this.canvas.addEventListener("contextmenu", this.handleContextMenu);
   }
 
   private getCanvasCoordinates(e: MouseEvent): { x: number; y: number } {
@@ -128,6 +148,7 @@ export class InputLayer {
     e.preventDefault();
 
     const { x, y } = this.getCanvasCoordinates(e);
+    console.log(x, y);
     const clickedElement = this.findElementAt(this.getElementsCallback(), x, y);
 
     this.inputState.interpretContextMenu(x, y, clickedElement?.id);
@@ -152,12 +173,12 @@ export class InputLayer {
   ): AppElement | undefined {
     for (let i = elements.length - 1; i >= 0; i--) {
       const el = elements[i];
-      if (
-        x >= el.x &&
-        x <= el.x + el.width &&
-        y >= el.y &&
-        y <= el.y + el.height
-      ) {
+      const left = el.x - el.width / 2;
+      const right = el.x + el.width / 2;
+      const top = el.y - el.height / 2;
+      const bottom = el.y + el.height / 2;
+
+      if (x >= left && x <= right && y >= top && y <= bottom) {
         return el;
       }
     }

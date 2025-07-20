@@ -7,11 +7,13 @@ export type ElementType =
 export type Mode = "create" | "connect" | "move" | "edit";
 export type Action =
   | "create"
+  | "duplicate"
   | "move"
   | "connect"
   | "select"
   | "delete"
   | "edit"
+  | "details"
   | "none";
 
 export interface Point {

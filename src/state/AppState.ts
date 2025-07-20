@@ -3,53 +3,55 @@ import { Connection } from "../models/Connection.ts";
 import { ElementType, Mode, Point } from "../types.ts";
 
 export class AppState {
-  public currentMode: Mode = "create";
-  public currentElementType: ElementType = "object";
-  public elements: AppElement[] = [];
-  public connections: Connection[] = [];
-  public selectedElement: AppElement | undefined = undefined;
-  public dragging: boolean = false;
-  public dragOffset: Point = { x: 0, y: 0 };
-  public fromElement: AppElement | undefined = undefined;
-  public zoom: number = 1;
-  public pan: Point = { x: 0, y: 0 };
-  public editingElement: AppElement | undefined = undefined;
+  currentMode: Mode = "create";
+  currentElementType: ElementType = "object";
+  elements: AppElement[] = [];
+  connections: Connection[] = [];
+  selectedElement: AppElement | undefined = undefined;
+  dragging: boolean = false;
+  dragOffset: Point = { x: 0, y: 0 };
+  fromElement: AppElement | undefined = undefined;
+  zoom: number = 1;
+  pan: Point = { x: 0, y: 0 };
+  editingElement: AppElement | undefined = undefined;
+  contextMenu: boolean = false;
+  targetPosition?: Point;
 
-  public setMode(mode: Mode): void {
+  setMode(mode: Mode): void {
     this.currentMode = mode;
   }
 
-  public setElementType(type: ElementType): void {
+  setElementType(type: ElementType): void {
     this.currentElementType = type;
   }
 
-  public addElement(element: AppElement): void {
+  addElement(element: AppElement): void {
     this.elements.push(element);
   }
 
-  public removeElement(id: string): void {
+  removeElement(id: string): void {
     const index = this.elements.findIndex((e) => e.id === id);
     if (index !== -1) {
       this.elements.splice(index, 1);
     }
   }
 
-  public addConnection(connection: Connection): void {
+  addConnection(connection: Connection): void {
     this.connections.push(connection);
   }
 
-  public removeConnection(id: string): void {
+  removeConnection(id: string): void {
     const index = this.connections.findIndex((c) => c.id === id);
     if (index !== -1) {
       this.connections.splice(index, 1);
     }
   }
 
-  public getElementById(id: string): AppElement | undefined {
+  getElementById(id: string): AppElement | undefined {
     return this.elements.find((e) => e.id === id);
   }
 
-  public getElementAt(x: number, y: number): AppElement | undefined {
+  getElementAt(x: number, y: number): AppElement | undefined {
     return this.elements.find((element) => {
       return (
         x >= element.cornerX &&
@@ -60,7 +62,7 @@ export class AppState {
     });
   }
 
-  public selectElement(element: AppElement | undefined): void {
+  selectElement(element: AppElement | undefined): void {
     if (this.selectedElement?.domElement) {
       this.selectedElement.domElement.classList.remove("selected");
     }
