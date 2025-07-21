@@ -7,13 +7,13 @@ export class AppState {
   currentElementType: ElementType = "object";
   elements: AppElement[] = [];
   connections: Connection[] = [];
-  selectedElement: AppElement | undefined = undefined;
+  selectedElement: AppElement | undefined;
   dragging: boolean = false;
   dragOffset: Point = { x: 0, y: 0 };
-  fromElement: AppElement | undefined = undefined;
+  fromElement: AppElement | undefined;
   zoom: number = 1;
   pan: Point = { x: 0, y: 0 };
-  editingElement: AppElement | undefined = undefined;
+  editingElement: AppElement | undefined;
   contextMenu: boolean = false;
   targetPosition?: Point;
 

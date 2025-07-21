@@ -13,7 +13,7 @@ export type Action =
   | "select"
   | "delete"
   | "edit"
-  | "details"
+  | "menu"
   | "none";
 
 export interface Point {
