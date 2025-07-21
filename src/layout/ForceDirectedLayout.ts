@@ -212,8 +212,4 @@ export class ForceDirectedLayout {
   getConfig(): ForceDirectedConfig {
     return { ...this.config };
   }
-
-  isLayoutRunning(): boolean {
-    return this.isRunning;
-  }
 }

@@ -7,7 +7,6 @@ export class InputLayer {
     private canvas: HTMLCanvasElement,
     private inputState: InputState,
     private getElementsCallback: () => AppElement[],
-    private getElementInputsCallback: () => HTMLInputElement[],
     private getPanelInputsCallback: () => HTMLInputElement[]
   ) {
     this.setupEventListeners();

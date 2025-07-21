@@ -58,17 +58,6 @@ export class AppState {
     return this.elements.find((e) => e.id === id);
   }
 
-  getElementAt(x: number, y: number): AppElement | undefined {
-    return this.elements.find((element) => {
-      return (
-        x >= element.cornerX &&
-        x <= element.cornerX + element.width &&
-        y >= element.cornerY &&
-        y <= element.cornerY + element.height
-      );
-    });
-  }
-
   selectElement(element: AppElement | undefined): void {
     if (this.selectedElement?.domElement) {
       this.selectedElement.domElement.classList.remove("selected");
