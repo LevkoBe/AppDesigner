@@ -226,7 +226,7 @@ export class InputLayer {
 
     if (this.inputState.isEditing && activeId) {
       if (e.key === "Escape" || e.key === "Enter") {
-        this.inputState.stopEditing();
+        this.inputState.setAction("select");
         e.preventDefault();
       }
     }
