@@ -14,7 +14,7 @@ export interface ForceDirectedConfig {
 
 export class ForceDirectedLayout {
   private config: ForceDirectedConfig;
-  private velocities: Map<number, Point> = new Map();
+  private velocities: Map<string, Point> = new Map();
   private isRunning: boolean = false;
   private animationId: number | undefined = undefined;
 
@@ -86,7 +86,7 @@ export class ForceDirectedLayout {
     elements: AppElement[],
     connections: Connection[]
   ): void {
-    const forces = new Map<number, Point>();
+    const forces = new Map<string, Point>();
 
     elements.forEach((element) => {
       forces.set(element.id, { x: 0, y: 0 });
@@ -142,8 +142,8 @@ export class ForceDirectedLayout {
     element1: AppElement,
     element2: AppElement
   ): Point {
-    const dx = element1.centerX - element2.centerX;
-    const dy = element1.centerY - element2.centerY;
+    const dx = element1.x - element2.x;
+    const dy = element1.y - element2.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance < this.config.minDistance) {
@@ -176,8 +176,8 @@ export class ForceDirectedLayout {
     element1: AppElement,
     element2: AppElement
   ): Point {
-    const dx = element2.centerX - element1.centerX;
-    const dy = element2.centerY - element1.centerY;
+    const dx = element2.x - element1.x;
+    const dy = element2.y - element1.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance === 0) return { x: 0, y: 0 };
@@ -195,10 +195,8 @@ export class ForceDirectedLayout {
     elements.forEach((element) => {
       const velocity = this.velocities.get(element.id)!;
 
-      const newX = element.centerX + velocity.x;
-      const newY = element.centerY + velocity.y;
-
-      element.setCenter(newX, newY);
+      element.x = element.x + velocity.x;
+      element.y = element.y + velocity.y;
 
       if (element.domElement) {
         element.domElement.style.left = `${element.cornerX}px`;

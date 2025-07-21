@@ -23,27 +23,29 @@ export class InputLayer {
     this.setupElementTypeButtons();
     this.setupContextMenuEvents();
     this.setupProjectEvents();
-    this.setupViewControlEvents();
+    this.setupControlsEvents();
     window.addEventListener("keydown", this.handleKeyDown);
   }
 
-  private setupViewControlEvents() {
-    const zoomInBtn = document.getElementById("zoomInBtn");
-    const zoomOutBtn = document.getElementById("zoomOutBtn");
-    const resetViewBtn = document.getElementById("resetViewBtn");
+  private setupControlsEvents() {
+    const toggleLayout = document.getElementById("layoutBtn")!;
+    const zoomInBtn = document.getElementById("zoomInBtn")!;
+    const zoomOutBtn = document.getElementById("zoomOutBtn")!;
+    const resetViewBtn = document.getElementById("resetViewBtn")!;
 
-    if (zoomInBtn)
-      zoomInBtn.addEventListener("click", (e) =>
-        this.handleViewZoomAction(e, "zoomIn")
-      );
-    if (zoomOutBtn)
-      zoomOutBtn.addEventListener("click", (e) =>
-        this.handleViewZoomAction(e, "zoomOut")
-      );
-    if (resetViewBtn)
-      resetViewBtn.addEventListener("click", (e) =>
-        this.handleViewZoomAction(e, "resetView")
-      );
+    toggleLayout.addEventListener("click", (e) => {
+      this.handleControlsAction(e, "layout");
+      toggleLayout.classList.toggle("active");
+    });
+    zoomInBtn.addEventListener("click", (e) =>
+      this.handleControlsAction(e, "zoomIn")
+    );
+    zoomOutBtn.addEventListener("click", (e) =>
+      this.handleControlsAction(e, "zoomOut")
+    );
+    resetViewBtn.addEventListener("click", (e) =>
+      this.handleControlsAction(e, "resetView")
+    );
   }
 
   private setupProjectEvents() {
@@ -185,9 +187,9 @@ export class InputLayer {
     this.inputState.interpretContextMenuOption(option);
   };
 
-  private handleViewZoomAction = (e: MouseEvent, action: Action) => {
+  private handleControlsAction = (e: MouseEvent, action: Action) => {
     e.preventDefault();
-    this.inputState.interpretViewZoomAction(action);
+    this.inputState.interpretControlsAction(action);
   };
 
   private handleDirectAction = (e: MouseEvent, action: Action) => {

@@ -16,6 +16,7 @@ export class AppState {
   contextMenu: boolean = false;
   targetPosition?: Point;
   rerenderNeeded: boolean = false;
+  autoLayout: boolean = true;
 
   setMode(mode: Mode): void {
     this.currentMode = mode;
