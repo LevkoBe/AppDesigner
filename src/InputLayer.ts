@@ -1,6 +1,5 @@
 import { InputState } from "./InputState.js";
-import { Mode } from "fs";
-import { ElementType } from "./types.js";
+import { Action, ElementType, Mode } from "./types.js";
 import { AppElement } from "./models/Element.js";
 
 export class InputLayer {
@@ -21,6 +20,7 @@ export class InputLayer {
     this.setupModeButtons();
     this.setupElementTypeButtons();
     this.setupContextMenuEvents();
+    window.addEventListener("keydown", this.handleKeyDown);
   }
 
   private setupModeButtons(): void {
@@ -54,18 +54,18 @@ export class InputLayer {
   private setupContextMenuEvents(): void {
     document
       .getElementById("editBtn")
-      ?.addEventListener("click", () =>
-        this.inputState.interpretContextMenuOption("edit")
+      ?.addEventListener("click", (e) =>
+        this.handleContextMenuOption(e, "edit")
       );
     document
       .getElementById("duplicateBtn")
-      ?.addEventListener("click", () =>
-        this.inputState.interpretContextMenuOption("duplicate")
+      ?.addEventListener("click", (e) =>
+        this.handleContextMenuOption(e, "duplicate")
       );
     document
       .getElementById("deleteBtn")
-      ?.addEventListener("click", () =>
-        this.inputState.interpretContextMenuOption("delete")
+      ?.addEventListener("click", (e) =>
+        this.handleContextMenuOption(e, "delete")
       );
 
     this.canvas.addEventListener("contextmenu", this.handleContextMenu);
@@ -148,18 +148,43 @@ export class InputLayer {
     e.preventDefault();
 
     const { x, y } = this.getCanvasCoordinates(e);
-    console.log(x, y);
     const clickedElement = this.findElementAt(this.getElementsCallback(), x, y);
 
     this.inputState.interpretContextMenu(x, y, clickedElement?.id);
   };
 
+  private handleContextMenuOption = (e: MouseEvent, option: Action): void => {
+    e.preventDefault();
+    this.inputState.interpretContextMenuOption(option);
+  };
+
+  private handleKeyDown = (e: KeyboardEvent): void => {
+    const activeId = this.inputState.activeId;
+    if (!activeId) return;
+
+    if (e.key === "F2") {
+      this.inputState.interpretTextEdit(activeId);
+      return;
+    }
+
+    if (!this.inputState.isEditing || !this.inputState.activeId) return;
+
+    const activeInput = document.querySelector(
+      `.element[data-id="${this.inputState.activeId}"] .element-input`
+    ) as HTMLInputElement | null;
+
+    if (!activeInput) return;
+
+    setTimeout(() => {
+      if (e.key === "Escape" || e.key === "Enter") {
+        this.inputState.stopEditing();
+        e.preventDefault();
+      } else this.inputState.interpretTextEdit(activeId, activeInput.value);
+    }, 10);
+  };
+
   public resetConnectionState(): void {
     this.inputState.resetConnectionState();
-  }
-
-  public handleTextEditComplete(elementId: string, newText: string): void {
-    this.inputState.interpretTextEdit(elementId, newText);
   }
 
   public handleDeleteConfirmed(elementId: string): void {

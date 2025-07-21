@@ -11,10 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const app = new App(canvas);
     window.app = app;
-    console.log("Application initialized successfully");
   } catch (error) {
     console.error("Failed to initialize application:", error);
-    alert("Failed to initialize application. Check console for details.");
   }
 });
 
