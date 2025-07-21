@@ -13,7 +13,7 @@ export class InputLayer {
     this.setupEventListeners();
   }
 
-  private setupEventListeners(): void {
+  private setupEventListeners() {
     this.canvas.addEventListener("click", this.handleClick);
     this.canvas.addEventListener("mousedown", this.handleMouseDown);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
@@ -23,29 +23,49 @@ export class InputLayer {
     this.setupElementTypeButtons();
     this.setupContextMenuEvents();
     this.setupProjectEvents();
+    this.setupViewControlEvents();
     window.addEventListener("keydown", this.handleKeyDown);
   }
 
-  private setupProjectEvents(): void {
+  private setupViewControlEvents() {
+    const zoomInBtn = document.getElementById("zoomInBtn");
+    const zoomOutBtn = document.getElementById("zoomOutBtn");
+    const resetViewBtn = document.getElementById("resetViewBtn");
+
+    if (zoomInBtn)
+      zoomInBtn.addEventListener("click", (e) =>
+        this.handleViewZoomAction(e, "zoomIn")
+      );
+    if (zoomOutBtn)
+      zoomOutBtn.addEventListener("click", (e) =>
+        this.handleViewZoomAction(e, "zoomOut")
+      );
+    if (resetViewBtn)
+      resetViewBtn.addEventListener("click", (e) =>
+        this.handleViewZoomAction(e, "resetView")
+      );
+  }
+
+  private setupProjectEvents() {
     const saveBtn = document.getElementById("saveBtn");
     const loadBtn = document.getElementById("loadBtn");
     const clearBtn = document.getElementById("clearBtn");
 
     if (saveBtn)
       saveBtn.addEventListener("click", (e) =>
-        this.handleProjectAction(e, "save")
+        this.handleDirectAction(e, "save")
       );
     if (loadBtn)
       loadBtn.addEventListener("click", (e) =>
-        this.handleProjectAction(e, "load")
+        this.handleDirectAction(e, "load")
       );
     if (clearBtn)
       clearBtn.addEventListener("click", (e) =>
-        this.handleProjectAction(e, "clear")
+        this.handleDirectAction(e, "clear")
       );
   }
 
-  private setupModeButtons(): void {
+  private setupModeButtons() {
     document.querySelectorAll(".mode-btn, [data-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
         document
@@ -59,7 +79,7 @@ export class InputLayer {
     });
   }
 
-  private setupElementTypeButtons(): void {
+  private setupElementTypeButtons() {
     document.querySelectorAll(".element-btn, [data-type]").forEach((btn) => {
       btn.addEventListener("click", () => {
         document
@@ -73,7 +93,7 @@ export class InputLayer {
     });
   }
 
-  private setupContextMenuEvents(): void {
+  private setupContextMenuEvents() {
     document
       .getElementById("editBtn")
       ?.addEventListener("click", (e) =>
@@ -104,7 +124,7 @@ export class InputLayer {
     return { x, y };
   }
 
-  private handleClick = (e: MouseEvent): void => {
+  private handleClick = (e: MouseEvent) => {
     const elements = this.getElementsCallback();
     const { x, y } = this.getCanvasCoordinates(e);
     const clickedElement = this.findElementAt(elements, x, y);
@@ -112,7 +132,7 @@ export class InputLayer {
     this.inputState.interpretClick(x, y, clickedElement?.id, e.shiftKey);
   };
 
-  private handleMouseDown = (e: MouseEvent): void => {
+  private handleMouseDown = (e: MouseEvent) => {
     const { x, y } = this.getCanvasCoordinates(e);
     const elements = this.getElementsCallback();
     const clickedElement = this.findElementAt(elements, x, y);
@@ -120,7 +140,7 @@ export class InputLayer {
     this.inputState.interpretMouseDown(x, y, clickedElement);
   };
 
-  private handleMouseMove = (e: MouseEvent): void => {
+  private handleMouseMove = (e: MouseEvent) => {
     const { x, y } = this.getCanvasCoordinates(e);
 
     if (this.inputState.activeId && this.inputState.currentMode === "move") {
@@ -137,11 +157,11 @@ export class InputLayer {
     }
   };
 
-  private handleMouseUp = (): void => {
+  private handleMouseUp = () => {
     this.inputState.interpretMouseUp();
   };
 
-  private handleDoubleClick = (e: MouseEvent): void => {
+  private handleDoubleClick = (e: MouseEvent) => {
     const { x, y } = this.getCanvasCoordinates(e);
     const elements = this.getElementsCallback();
     const clickedElement = this.findElementAt(elements, x, y);
@@ -151,7 +171,7 @@ export class InputLayer {
     }
   };
 
-  private handleContextMenu = (e: MouseEvent): void => {
+  private handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
 
     const { x, y } = this.getCanvasCoordinates(e);
@@ -160,17 +180,22 @@ export class InputLayer {
     this.inputState.interpretContextMenu(x, y, clickedElement?.id);
   };
 
-  private handleContextMenuOption = (e: MouseEvent, option: Action): void => {
+  private handleContextMenuOption = (e: MouseEvent, option: Action) => {
     e.preventDefault();
     this.inputState.interpretContextMenuOption(option);
   };
 
-  private handleProjectAction = (e: MouseEvent, action: Action) => {
+  private handleViewZoomAction = (e: MouseEvent, action: Action) => {
     e.preventDefault();
-    this.inputState.interpretProjectAction(action);
+    this.inputState.interpretViewZoomAction(action);
   };
 
-  private handleKeyDown = (e: KeyboardEvent): void => {
+  private handleDirectAction = (e: MouseEvent, action: Action) => {
+    e.preventDefault();
+    this.inputState.setAction(action);
+  };
+
+  private handleKeyDown = (e: KeyboardEvent) => {
     const activeId = this.inputState.activeId;
 
     if (activeId && e.key === "F2") {
@@ -208,11 +233,11 @@ export class InputLayer {
     });
   };
 
-  resetConnectionState(): void {
+  resetConnectionState() {
     this.inputState.resetConnectionState();
   }
 
-  handleDeleteConfirmed(elementId: string): void {
+  handleDeleteConfirmed(elementId: string) {
     this.inputState.interpretDelete(elementId);
   }
 
