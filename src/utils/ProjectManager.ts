@@ -13,7 +13,7 @@ export class ProjectManager {
     this.domManager = domManager;
   }
 
-  public saveProject(): void {
+  saveProject(): void {
     const project: ProjectData = {
       elements: this.appState.elements.map((e) => e.serialize()),
       connections: this.appState.connections.map((c) => c.serialize()),
@@ -28,7 +28,7 @@ export class ProjectManager {
     URL.revokeObjectURL(url);
   }
 
-  public loadProject(): void {
+  loadProject(): void {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";

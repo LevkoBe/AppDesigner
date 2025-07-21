@@ -2,9 +2,9 @@ import { AppElement } from "./Element.ts";
 import { ConnectionData } from "../types.ts";
 
 export class Connection {
-  public id: string;
-  public from: AppElement;
-  public to: AppElement;
+  id: string;
+  from: AppElement;
+  to: AppElement;
 
   constructor(from: AppElement, to: AppElement) {
     this.id = (Date.now() + Math.random()).toString();
@@ -15,7 +15,7 @@ export class Connection {
     to.connections.push(this);
   }
 
-  public serialize(): ConnectionData {
+  serialize(): ConnectionData {
     return {
       id: this.id,
       from: this.from.id,

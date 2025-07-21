@@ -6,7 +6,9 @@ export class InputLayer {
   constructor(
     private canvas: HTMLCanvasElement,
     private inputState: InputState,
-    private getElementsCallback: () => AppElement[]
+    private getElementsCallback: () => AppElement[],
+    private getElementInputsCallback: () => HTMLInputElement[],
+    private getPanelInputsCallback: () => HTMLInputElement[]
   ) {
     this.setupEventListeners();
   }
@@ -160,34 +162,47 @@ export class InputLayer {
 
   private handleKeyDown = (e: KeyboardEvent): void => {
     const activeId = this.inputState.activeId;
-    if (!activeId) return;
 
-    if (e.key === "F2") {
+    if (activeId && e.key === "F2") {
       this.inputState.interpretTextEdit(activeId);
       return;
     }
 
-    if (!this.inputState.isEditing || !this.inputState.activeId) return;
+    if (this.inputState.isEditing && activeId) {
+      const activeInput = this.getElementInputsCallback().find((input) => {
+        const parent = input.closest(".element") as HTMLElement | null;
+        return parent?.dataset.id === activeId;
+      });
 
-    const activeInput = document.querySelector(
-      `.element[data-id="${this.inputState.activeId}"] .element-input`
-    ) as HTMLInputElement | null;
+      if (activeInput) {
+        setTimeout(() => {
+          if (e.key === "Escape" || e.key === "Enter") {
+            this.inputState.stopEditing();
+            e.preventDefault();
+          } else {
+            this.inputState.interpretTextEdit(activeId, activeInput.value);
+          }
+        }, 10);
+      }
+    }
 
-    if (!activeInput) return;
-
-    setTimeout(() => {
-      if (e.key === "Escape" || e.key === "Enter") {
-        this.inputState.stopEditing();
-        e.preventDefault();
-      } else this.inputState.interpretTextEdit(activeId, activeInput.value);
-    }, 10);
+    this.getPanelInputsCallback().forEach((input) => {
+      if (document.activeElement === input) {
+        setTimeout(() => {
+          const selected = this.inputState.activeId;
+          if (selected) {
+            this.inputState.interpretTextEdit(selected, input.value);
+          }
+        }, 10);
+      }
+    });
   };
 
-  public resetConnectionState(): void {
+  resetConnectionState(): void {
     this.inputState.resetConnectionState();
   }
 
-  public handleDeleteConfirmed(elementId: string): void {
+  handleDeleteConfirmed(elementId: string): void {
     this.inputState.interpretDelete(elementId);
   }
 

@@ -31,7 +31,7 @@ export class ForceDirectedLayout {
     };
   }
 
-  public start(elements: AppElement[], connections: Connection[]): void {
+  start(elements: AppElement[], connections: Connection[]): void {
     if (this.isRunning) return;
 
     this.isRunning = true;
@@ -39,7 +39,7 @@ export class ForceDirectedLayout {
     this.animate(elements, connections);
   }
 
-  public stop(): void {
+  stop(): void {
     this.isRunning = false;
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
@@ -47,7 +47,7 @@ export class ForceDirectedLayout {
     }
   }
 
-  public step(elements: AppElement[], connections: Connection[]): void {
+  step(elements: AppElement[], connections: Connection[]): void {
     if (elements.length === 0) return;
 
     const validConnections = connections.filter(
@@ -207,15 +207,15 @@ export class ForceDirectedLayout {
     });
   }
 
-  public updateConfig(newConfig: Partial<ForceDirectedConfig>): void {
+  updateConfig(newConfig: Partial<ForceDirectedConfig>): void {
     this.config = { ...this.config, ...newConfig };
   }
 
-  public getConfig(): ForceDirectedConfig {
+  getConfig(): ForceDirectedConfig {
     return { ...this.config };
   }
 
-  public isLayoutRunning(): boolean {
+  isLayoutRunning(): boolean {
     return this.isRunning;
   }
 }

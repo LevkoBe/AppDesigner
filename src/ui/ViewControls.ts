@@ -10,7 +10,7 @@ export class ViewControls {
     this.domManager = domManager;
   }
 
-  public zoomIn = (): void => {
+  zoomIn = (): void => {
     this.appState.zoom *= 1.2;
     this.domManager.setCanvasTransform(
       this.appState.zoom,
@@ -19,7 +19,7 @@ export class ViewControls {
     );
   };
 
-  public zoomOut = (): void => {
+  zoomOut = (): void => {
     this.appState.zoom /= 1.2;
     this.domManager.setCanvasTransform(
       this.appState.zoom,
@@ -28,7 +28,7 @@ export class ViewControls {
     );
   };
 
-  public resetView = (): void => {
+  resetView = (): void => {
     this.appState.zoom = 1;
     this.appState.pan = { x: 0, y: 0 };
     this.domManager.setCanvasTransform(1, 0, 0);

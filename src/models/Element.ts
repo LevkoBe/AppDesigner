@@ -2,13 +2,13 @@ import { ElementType, ElementData } from "../types.ts";
 import { Connection } from "./Connection.ts";
 
 export class AppElement {
-  public id: string;
-  public text: string;
-  public width: number;
-  public height: number;
-  public children: AppElement[];
-  public connections: Connection[];
-  public domElement?: HTMLElement;
+  id: string;
+  text: string;
+  width: number;
+  height: number;
+  children: AppElement[];
+  connections: Connection[];
+  domElement?: HTMLElement;
 
   constructor(
     public type: ElementType,
@@ -17,13 +17,9 @@ export class AppElement {
     public parent: AppElement | undefined = undefined
   ) {
     this.id = (Date.now() + Math.random()).toString();
-    this.type = type;
     this.text = this.getDefaultText();
     this.width = this.getDefaultWidth();
     this.height = this.getDefaultHeight();
-    this.x = x;
-    this.y = y;
-    this.parent = parent;
     this.children = [];
     this.connections = [];
 
@@ -32,19 +28,11 @@ export class AppElement {
     }
   }
 
-  // redundant
-  public get centerX(): number {
-    return this.x;
-  }
-  public get centerY(): number {
-    return this.y;
-  }
-
-  public get cornerX(): number {
+  get cornerX(): number {
     return this.x - this.width / 2;
   }
 
-  public get cornerY(): number {
+  get cornerY(): number {
     return this.y - this.height / 2;
   }
 
@@ -81,12 +69,12 @@ export class AppElement {
     return defaults[this.type] || 60;
   }
 
-  public serialize(): ElementData {
+  serialize(): ElementData {
     return {
       id: this.id,
       type: this.type,
-      x: this.centerX,
-      y: this.centerY,
+      x: this.x,
+      y: this.y,
       text: this.text,
       width: this.width,
       height: this.height,

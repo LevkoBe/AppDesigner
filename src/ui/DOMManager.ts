@@ -8,11 +8,11 @@ export class DOMManager {
     this.canvas = canvas;
   }
 
-  public getCanvasRect(): DOMRect {
+  getCanvasRect(): DOMRect {
     return this.canvas.getBoundingClientRect();
   }
 
-  public createElementDOM(element: AppElement): void {
+  createElementDOM(element: AppElement): void {
     const div = document.createElement("div");
     div.className = `element ${element.type}`;
     if (element.parent) {
@@ -35,7 +35,7 @@ export class DOMManager {
     element.domElement = div;
   }
 
-  public updateElementPosition(element: AppElement): void {
+  updateElementPosition(element: AppElement): void {
     if (element.domElement) {
       element.domElement.style.left = element.cornerX + "px";
       element.domElement.style.top = element.cornerY + "px";
@@ -43,13 +43,13 @@ export class DOMManager {
     element.children.forEach((child) => this.updateElementPosition(child));
   }
 
-  public updateElementTextContent(element: AppElement): void {
+  updateElementTextContent(element: AppElement): void {
     if (element.domElement) {
       element.domElement.textContent = element.text;
     }
   }
 
-  public editElementText(element: AppElement): void {
+  editElementText(element: AppElement): void {
     const newText = prompt("Edit element text:", element.text);
     if (newText !== undefined) {
       element.text = newText;
@@ -57,7 +57,7 @@ export class DOMManager {
     }
   }
 
-  public createConnectionDOM(connection: Connection): void {
+  createConnectionDOM(connection: Connection): void {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.classList.add("connection-svg");
     svg.style.mousePosition = "absolute";
@@ -93,7 +93,7 @@ export class DOMManager {
     this.canvas.appendChild(svg);
   }
 
-  public updateConnections(connections: Connection[]): void {
+  updateConnections(connections: Connection[]): void {
     document.querySelectorAll(".connection-svg").forEach((svg) => svg.remove());
 
     connections.forEach((connection) => {
@@ -101,28 +101,28 @@ export class DOMManager {
     });
   }
 
-  public showElementTypeSelection(): void {
+  showElementTypeSelection(): void {
     const selector = document.getElementById("elementTypeSelection");
     if (selector) selector.classList.remove("hidden");
   }
 
-  public hideElementTypeSelection(): void {
+  hideElementTypeSelection(): void {
     const selector = document.getElementById("elementTypeSelection");
     if (selector) selector.classList.add("hidden");
   }
 
-  public updateCanvasCursor(mode: string): void {
+  updateCanvasCursor(mode: string): void {
     this.canvas.className = `canvas ${mode}-mode`;
   }
 
-  public updateStatus(statusText: string): void {
+  updateStatus(statusText: string): void {
     const status = document.getElementById("status");
     if (status) {
       status.textContent = statusText;
     }
   }
 
-  public setCanvasTransform(zoom: number, panX: number, panY: number): void {
+  setCanvasTransform(zoom: number, panX: number, panY: number): void {
     this.canvas.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
   }
 }

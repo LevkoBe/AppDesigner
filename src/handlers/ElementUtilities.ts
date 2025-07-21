@@ -5,7 +5,7 @@ import { ElementType, Mode } from "../types.ts";
 export class ElementUtilities {
   constructor(private state: AppState, private dom: DOMManager) {}
 
-  public updateStatus(): void {
+  updateStatus(): void {
     const modeText: Record<Mode, string> = {
       create: "Create/Child Mode",
       connect: "Connection Mode",

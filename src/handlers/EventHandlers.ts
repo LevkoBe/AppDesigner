@@ -1,6 +1,5 @@
 import { AppState } from "../state/AppState.ts";
 import { DOMManager } from "../ui/DOMManager.ts";
-import { PropertiesPanel } from "../ui/PropertiesPanel.ts";
 import { Mode, ElementType } from "../types.ts";
 import { ElementUtilities } from "./ElementUtilities.ts";
 
@@ -11,34 +10,22 @@ export class EventHandlers {
   private utils: ElementUtilities;
   private clickHandler: ClickHandler;
 
-  constructor(
-    private state: AppState,
-    private dom: DOMManager,
-    private panel: PropertiesPanel
-  ) {
+  constructor(private state: AppState, private dom: DOMManager) {
     this.utils = new ElementUtilities(state, dom);
-    this.clickHandler = new ClickHandler(
-      this.dom,
-      this.panel,
-      this.state,
-      this.utils
-    );
+    this.clickHandler = new ClickHandler(this.dom, this.state, this.utils);
   }
 
-  public handleCanvasClick = (e: MouseEvent) =>
-    this.clickHandler.handleCanvasClick(e);
+  handleCanvasClick = (e: MouseEvent) => this.clickHandler.handleCanvasClick(e);
 
-  public handleMouseDown = (e: MouseEvent) =>
-    this.clickHandler.handleMouseDown(e);
+  handleMouseDown = (e: MouseEvent) => this.clickHandler.handleMouseDown(e);
 
-  public handleMouseMove = (e: MouseEvent) =>
-    this.clickHandler.handleMouseMove(e);
+  handleMouseMove = (e: MouseEvent) => this.clickHandler.handleMouseMove(e);
 
-  public handleMouseUp = () => this.clickHandler.handleMouseUp();
+  handleMouseUp = () => this.clickHandler.handleMouseUp();
 
-  public handleModeChange = (mode: Mode) =>
+  handleModeChange = (mode: Mode) =>
     handleModeChange(mode, this.state, this.dom, this.utils);
 
-  public handleElementTypeChange = (type: ElementType) =>
+  handleElementTypeChange = (type: ElementType) =>
     handleElementTypeChange(type, this.state, this.utils);
 }

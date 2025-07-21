@@ -1,27 +1,23 @@
 import { AppElement } from "../models/Element.ts";
 import { AppState } from "../state/AppState.ts";
 import { DOMManager } from "../ui/DOMManager.ts";
-import { PropertiesPanel } from "../ui/PropertiesPanel.ts";
 import { ElementUtilities } from "./ElementUtilities.ts";
 
 export class ClickHandler {
   constructor(
     private dom: DOMManager,
-    private panel: PropertiesPanel,
     private state: AppState,
     private utils: ElementUtilities
   ) {}
 
-  public defineClicked(
-    e: MouseEvent
-  ): [AppElement | undefined, number, number] {
+  defineClicked(e: MouseEvent): [AppElement | undefined, number, number] {
     const rect = this.dom.getCanvasRect();
     const x = (e.clientX - rect.left) / this.state.zoom - this.state.pan.x;
     const y = (e.clientY - rect.top) / this.state.zoom - this.state.pan.y;
     return [this.state.getElementAt(x, y), x, y];
   }
 
-  public handleCanvasClick(e: MouseEvent): void {
+  handleCanvasClick(e: MouseEvent): void {
     const [clicked] = this.defineClicked(e);
 
     if (!clicked && this.state.currentMode !== "connect") {
@@ -57,7 +53,7 @@ export class ClickHandler {
     }
   }
 
-  public handleMouseDown = (e: MouseEvent) => {
+  handleMouseDown = (e: MouseEvent) => {
     const [element, x, y] = this.defineClicked(e);
     if (this.state.currentMode === "connect" && !this.state.fromElement) {
       if (element) {
@@ -81,7 +77,7 @@ export class ClickHandler {
     }
   };
 
-  public handleMouseMove = (e: MouseEvent) => {
+  handleMouseMove = (e: MouseEvent) => {
     // this.state.selectedElement?.updateCorner(newX, newY); // todo
 
     // this.dom.updateElementPosition(this.state.selectedElement); // todo
@@ -92,7 +88,7 @@ export class ClickHandler {
     e.preventDefault();
   };
 
-  public handleMouseUp = () => {
+  handleMouseUp = () => {
     if (this.state.dragging && this.state.selectedElement) {
       this.state.selectedElement.domElement?.classList.remove("dragging"); // todo
     }
