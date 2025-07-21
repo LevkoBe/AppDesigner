@@ -79,6 +79,14 @@ export class AppState {
     }
   }
 
+  hasConnection(fromId: string, toId: string): boolean {
+    return this.connections.some(
+      (conn) =>
+        (conn.from.id === fromId && conn.to.id === toId) ||
+        (conn.from.id === toId && conn.to.id === fromId)
+    );
+  }
+
   serialize(): string {
     return JSON.stringify({
       elements: this.elements.map((e) => e.serialize()),

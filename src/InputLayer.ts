@@ -136,10 +136,13 @@ export class InputLayer {
 
   private handleMouseDown = (e: MouseEvent) => {
     const { x, y } = this.getCanvasCoordinates(e);
-    const elements = this.getElementsCallback();
-    const clickedElement = this.findElementAt(elements, x, y);
+    const clickedElement = this.findElementAt(this.getElementsCallback(), x, y);
 
     this.inputState.interpretMouseDown(x, y, clickedElement);
+  };
+
+  private handleMouseUp = () => {
+    this.inputState.interpretMouseUp();
   };
 
   private handleMouseMove = (e: MouseEvent) => {
@@ -157,10 +160,6 @@ export class InputLayer {
 
       e.preventDefault();
     }
-  };
-
-  private handleMouseUp = () => {
-    this.inputState.interpretMouseUp();
   };
 
   private handleDoubleClick = (e: MouseEvent) => {
