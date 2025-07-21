@@ -25,6 +25,7 @@ export class InputLayer {
     this.setupProjectEvents();
     this.setupControlsEvents();
     window.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("input", this.handleInput);
   }
 
   private setupControlsEvents() {
@@ -196,6 +197,25 @@ export class InputLayer {
     this.inputState.setAction(action);
   };
 
+  private handleInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    if (!target || target.tagName !== "INPUT") return;
+
+    const activeId = this.inputState.activeId;
+    if (!activeId) return;
+
+    const elementParent = target.closest(".element") as HTMLElement | null;
+    if (elementParent?.dataset.id === activeId && this.inputState.isEditing) {
+      this.inputState.interpretTextEdit(activeId, target.value);
+      return;
+    }
+
+    const panelInputs = this.getPanelInputsCallback();
+    if (panelInputs.includes(target) && activeId) {
+      this.inputState.interpretTextEdit(activeId, target.value);
+    }
+  };
+
   private handleKeyDown = (e: KeyboardEvent) => {
     const activeId = this.inputState.activeId;
 
@@ -205,33 +225,11 @@ export class InputLayer {
     }
 
     if (this.inputState.isEditing && activeId) {
-      const activeInput = this.getElementInputsCallback().find((input) => {
-        const parent = input.closest(".element") as HTMLElement | null;
-        return parent?.dataset.id === activeId;
-      });
-
-      if (activeInput) {
-        setTimeout(() => {
-          if (e.key === "Escape" || e.key === "Enter") {
-            this.inputState.stopEditing();
-            e.preventDefault();
-          } else {
-            this.inputState.interpretTextEdit(activeId, activeInput.value);
-          }
-        }, 10);
+      if (e.key === "Escape" || e.key === "Enter") {
+        this.inputState.stopEditing();
+        e.preventDefault();
       }
     }
-
-    this.getPanelInputsCallback().forEach((input) => {
-      if (document.activeElement === input) {
-        setTimeout(() => {
-          const selected = this.inputState.activeId;
-          if (selected) {
-            this.inputState.interpretTextEdit(selected, input.value);
-          }
-        }, 10);
-      }
-    });
   };
 
   resetConnectionState() {
