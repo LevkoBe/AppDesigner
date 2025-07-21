@@ -1,6 +1,12 @@
 import { AppElement } from "../models/Element.ts";
 import { Connection } from "../models/Connection.ts";
-import { ElementType, Mode, Point } from "../types.ts";
+import {
+  ConnectionData,
+  ElementData,
+  ElementType,
+  Mode,
+  Point,
+} from "../types.ts";
 
 export class AppState {
   currentMode: Mode = "create";
@@ -88,20 +94,57 @@ export class AppState {
 
     this.clear();
 
-    this.elements = data.elements.map((e: AppElement) => {
-      const element = new AppElement(e.type, e.x, e.y, e.parent);
-      element.id = e.id;
-      element.width = e.width;
-      element.height = e.height;
+    const elementMap = new Map<string, AppElement>();
+    const parentChildMap = new Map<string, string>();
+
+    this.elements = data.elements.map((elementData: ElementData) => {
+      const element = new AppElement(
+        elementData.type,
+        elementData.x,
+        elementData.y
+      );
+      element.id = elementData.id;
+      element.text = elementData.text;
+      element.width = elementData.width;
+      element.height = elementData.height;
+
+      elementMap.set(element.id, element);
+
+      if (elementData.parentId) {
+        parentChildMap.set(element.id, elementData.parentId);
+      }
+
       return element;
     });
 
-    this.connections = data.connections.map((c: Connection) => {
-      const from = this.getElementById(c.from.id);
-      const to = this.getElementById(c.to.id);
-      if (!from || !to) throw new Error("Invalid connection: missing element");
-      return new Connection(from, to);
-    });
+    for (const [childId, parentId] of parentChildMap) {
+      const child = elementMap.get(childId);
+      const parent = elementMap.get(parentId);
+
+      if (child && parent) {
+        child.parent = parent;
+        if (!parent.children.includes(child)) {
+          parent.children.push(child);
+        }
+      }
+    }
+
+    this.connections = data.connections.map(
+      (connectionData: ConnectionData) => {
+        const from = this.getElementById(connectionData.from);
+        const to = this.getElementById(connectionData.to);
+
+        if (!from || !to) {
+          throw new Error(
+            `Invalid connection: missing element (from: ${connectionData.from}, to: ${connectionData.to})`
+          );
+        }
+
+        const connection = new Connection(from, to);
+        connection.id = connectionData.id;
+        return connection;
+      }
+    );
   }
 
   clear(): void {
