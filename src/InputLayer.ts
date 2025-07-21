@@ -117,35 +117,20 @@ export class InputLayer {
     const elements = this.getElementsCallback();
     const clickedElement = this.findElementAt(elements, x, y);
 
-    this.inputState.interpretMouseDown(x, y, clickedElement?.id);
-
-    if (clickedElement && this.inputState.currentMode === "move") {
-      this.inputState.dragOffset = {
-        x: x - clickedElement.x,
-        y: y - clickedElement.y,
-      };
-      e.preventDefault();
-    }
+    this.inputState.interpretMouseDown(x, y, clickedElement);
   };
 
   private handleMouseMove = (e: MouseEvent): void => {
     const { x, y } = this.getCanvasCoordinates(e);
 
-    if (
-      this.inputState.isDragging &&
-      this.inputState.activeId &&
-      this.inputState.currentMode === "move"
-    ) {
+    if (this.inputState.activeId && this.inputState.currentMode === "move") {
       const elements = this.getElementsCallback();
       const draggedElement = elements.find(
         (el) => el.id === this.inputState.activeId
       );
 
       if (draggedElement && this.inputState.dragOffset) {
-        const newX = x - this.inputState.dragOffset.x;
-        const newY = y - this.inputState.dragOffset.y;
-
-        this.inputState.interpretDrag(this.inputState.activeId, newX, newY);
+        this.inputState.interpretDrag(this.inputState.activeId, x, y);
       }
 
       e.preventDefault();

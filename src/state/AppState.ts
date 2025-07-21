@@ -9,7 +9,6 @@ export class AppState {
   connections: Connection[] = [];
   selectedElement: AppElement | undefined;
   dragging: boolean = false;
-  dragOffset: Point = { x: 0, y: 0 };
   fromElement: AppElement | undefined;
   zoom: number = 1;
   pan: Point = { x: 0, y: 0 };
@@ -112,7 +111,6 @@ export class AppState {
     this.connections = [];
     this.selectedElement = undefined;
     this.dragging = false;
-    this.dragOffset = { x: 0, y: 0 };
     this.fromElement = undefined;
     this.zoom = 1;
     this.pan = { x: 0, y: 0 };

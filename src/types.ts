@@ -17,8 +17,7 @@ export type Action =
   | "none"
   | "save"
   | "load"
-  | "clear"
-  | "update";
+  | "clear";
 
 export interface Point {
   x: number;
