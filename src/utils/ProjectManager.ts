@@ -1,24 +1,10 @@
 import { AppState } from "../state/AppState.ts";
-import { DOMManager } from "../ui/DOMManager.ts";
-import { AppElement } from "../models/Element.ts";
-import { Connection } from "../models/Connection.ts";
-import { ProjectData } from "../types.ts";
 
 export class ProjectManager {
-  private appState: AppState;
-  private domManager: DOMManager;
-
-  constructor(appState: AppState, domManager: DOMManager) {
-    this.appState = appState;
-    this.domManager = domManager;
-  }
+  constructor(private appState: AppState) {}
 
   saveProject(): void {
-    const project: ProjectData = {
-      elements: this.appState.elements.map((e) => e.serialize()),
-      connections: this.appState.connections.map((c) => c.serialize()),
-    };
-    const data = JSON.stringify(project, undefined, 2);
+    const data = this.appState.serialize();
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -41,34 +27,8 @@ export class ProjectManager {
           try {
             const result = e.target?.result;
             if (typeof result === "string") {
-              const project: ProjectData = JSON.parse(result);
-              this.clearCanvas();
-
-              project.elements.forEach((elementData) => {
-                const element = new AppElement(
-                  elementData.type,
-                  elementData.x,
-                  elementData.y,
-                  elementData.text
-                );
-                element.id = elementData.id;
-                element.width = elementData.width;
-                element.height = elementData.height;
-                this.appState.addElement(element);
-                this.domManager.createElementDOM(element);
-              });
-
-              project.connections.forEach((connData) => {
-                const from = this.appState.getElementById(connData.from);
-                const to = this.appState.getElementById(connData.to);
-                if (from && to) {
-                  const connection = new Connection(from, to);
-                  connection.id = connData.id;
-                  this.appState.addConnection(connection);
-                }
-              });
-
-              this.render();
+              this.appState.deserialize(result);
+              this.appState.rerenderNeeded = true;
             }
           } catch (error) {
             alert("Error loading project: " + (error as Error).message);
@@ -78,16 +38,5 @@ export class ProjectManager {
       }
     };
     input.click();
-  }
-
-  private clearCanvas(): void {
-    this.appState.clear();
-    document
-      .querySelectorAll(".connection-svg")
-      .forEach((conn) => conn.remove());
-  }
-
-  private render(): void {
-    this.domManager.updateConnections(this.appState.connections);
   }
 }

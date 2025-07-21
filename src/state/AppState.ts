@@ -16,6 +16,7 @@ export class AppState {
   editingElement: AppElement | undefined;
   contextMenu: boolean = false;
   targetPosition?: Point;
+  rerenderNeeded: boolean = false;
 
   setMode(mode: Mode): void {
     this.currentMode = mode;
@@ -87,11 +88,36 @@ export class AppState {
 
   deserialize(json: string): void {
     const data = JSON.parse(json);
-    this.elements = data.elements.map(
-      (e: AppElement) => new AppElement(e.type, e.x, e.y, e.parent)
-    );
-    this.connections = data.connections.map(
-      (c: Connection) => new Connection(c.from, c.to)
-    );
+
+    this.clear();
+
+    this.elements = data.elements.map((e: AppElement) => {
+      const element = new AppElement(e.type, e.x, e.y, e.parent);
+      element.id = e.id;
+      element.width = e.width;
+      element.height = e.height;
+      return element;
+    });
+
+    this.connections = data.connections.map((c: Connection) => {
+      const from = this.getElementById(c.from.id);
+      const to = this.getElementById(c.to.id);
+      if (!from || !to) throw new Error("Invalid connection: missing element");
+      return new Connection(from, to);
+    });
+  }
+
+  clear(): void {
+    this.elements = [];
+    this.connections = [];
+    this.selectedElement = undefined;
+    this.dragging = false;
+    this.dragOffset = { x: 0, y: 0 };
+    this.fromElement = undefined;
+    this.zoom = 1;
+    this.pan = { x: 0, y: 0 };
+    this.editingElement = undefined;
+    this.contextMenu = false;
+    this.targetPosition = undefined;
   }
 }

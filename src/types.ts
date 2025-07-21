@@ -14,7 +14,11 @@ export type Action =
   | "delete"
   | "edit"
   | "menu"
-  | "none";
+  | "none"
+  | "save"
+  | "load"
+  | "clear"
+  | "update";
 
 export interface Point {
   x: number;

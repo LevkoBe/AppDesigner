@@ -22,7 +22,27 @@ export class InputLayer {
     this.setupModeButtons();
     this.setupElementTypeButtons();
     this.setupContextMenuEvents();
+    this.setupProjectEvents();
     window.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  private setupProjectEvents(): void {
+    const saveBtn = document.getElementById("saveBtn");
+    const loadBtn = document.getElementById("loadBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    if (saveBtn)
+      saveBtn.addEventListener("click", (e) =>
+        this.handleProjectAction(e, "save")
+      );
+    if (loadBtn)
+      loadBtn.addEventListener("click", (e) =>
+        this.handleProjectAction(e, "load")
+      );
+    if (clearBtn)
+      clearBtn.addEventListener("click", (e) =>
+        this.handleProjectAction(e, "clear")
+      );
   }
 
   private setupModeButtons(): void {
@@ -158,6 +178,11 @@ export class InputLayer {
   private handleContextMenuOption = (e: MouseEvent, option: Action): void => {
     e.preventDefault();
     this.inputState.interpretContextMenuOption(option);
+  };
+
+  private handleProjectAction = (e: MouseEvent, action: Action) => {
+    e.preventDefault();
+    this.inputState.interpretProjectAction(action);
   };
 
   private handleKeyDown = (e: KeyboardEvent): void => {
