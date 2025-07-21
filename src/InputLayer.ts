@@ -76,7 +76,7 @@ export class InputLayer {
         btn.classList.add("active");
 
         const mode = (btn as HTMLElement).dataset.mode as Mode;
-        if (mode) this.inputState.currentMode = mode;
+        if (mode) this.inputState.interpretModeChange(mode);
       });
     });
   }

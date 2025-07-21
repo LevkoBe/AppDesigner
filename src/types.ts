@@ -19,9 +19,10 @@ export type Action =
   | "load"
   | "clear"
   | "zoomIn"
+  | "layout"
   | "zoomOut"
   | "resetView"
-  | "layout";
+  | "changeMode";
 
 export interface Point {
   x: number;
