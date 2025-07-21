@@ -44,7 +44,6 @@ export class LogicLayer {
       case "connect":
         this.handleConnect();
         activeId = this.inputState.activeId;
-        console.log(activeId);
         secondaryId = undefined;
         this.tryRestartLayout();
         break;
@@ -109,7 +108,6 @@ export class LogicLayer {
 
     const { x, y } = this.inputState.mousePosition;
     const parentId = this.inputState.activeId;
-    console.log(parentId);
     const parent = parentId
       ? this.appState.getElementById(parentId) ?? undefined
       : undefined;

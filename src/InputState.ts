@@ -145,6 +145,14 @@ export class InputState {
   interpretContextMenuOption(option: Action) {
     if (!this.activeId) return;
     this.setAction(option);
+    switch (option) {
+      case "duplicate":
+        this.setAction("create");
+        this.activeId = undefined;
+        break;
+      default:
+        this.setAction(option);
+    }
   }
 
   interpretControlsAction(action: Action) {
