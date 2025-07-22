@@ -9,12 +9,14 @@ export class AppElement {
   children: AppElement[];
   connections: Connection[];
   domElement?: HTMLElement;
+  isAnchored: boolean;
 
   constructor(
     public type: ElementType,
     public x: number,
     public y: number,
-    public parent: AppElement | undefined = undefined
+    public parent: AppElement | undefined = undefined,
+    isAnchored: boolean = false
   ) {
     this.id = (Date.now() + Math.random()).toString();
     this.text = this.getDefaultText();
@@ -22,6 +24,7 @@ export class AppElement {
     this.height = this.getDefaultHeight();
     this.children = [];
     this.connections = [];
+    this.isAnchored = isAnchored;
 
     if (parent) {
       parent.children.push(this);
@@ -81,6 +84,7 @@ export class AppElement {
       parentId: this.parent ? this.parent.id : undefined,
       childIds: this.children.map((child) => child.id),
       connectionIds: this.connections.map((conn) => conn.id),
+      isAnchored: this.isAnchored,
     };
   }
 }

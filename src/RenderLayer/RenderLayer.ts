@@ -243,7 +243,7 @@ export class RenderLayer {
     else selector.classList.add("hidden");
   }
 
-  updateStatus(): void {
+  updateStatus() {
     const modeText: Record<Mode, string> = {
       create: "Create/Child Mode",
       connect: "Connection Mode",
@@ -272,7 +272,7 @@ export class RenderLayer {
     }
   }
 
-  setCanvasTransform(zoom: number, panX: number, panY: number): void {
+  setCanvasTransform(zoom: number, panX: number, panY: number) {
     this.canvas.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
   }
 }

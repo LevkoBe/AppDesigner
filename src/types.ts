@@ -8,10 +8,11 @@ export type Mode = "create" | "connect" | "move" | "edit";
 export type Action =
   | "create"
   | "duplicate"
-  | "move"
   | "connect"
   | "select"
   | "delete"
+  | "anchor"
+  | "move"
   | "edit"
   | "menu"
   | "none"
@@ -40,6 +41,7 @@ export interface ElementData {
   parentId: string | undefined;
   childIds: string[];
   connectionIds: string[];
+  isAnchored: boolean;
 }
 
 export interface ConnectionData {

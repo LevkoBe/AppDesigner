@@ -56,6 +56,10 @@ export class LogicLayer {
         activeId = this.handleSelect();
         break;
 
+      case "anchor":
+        this.handleAnchor();
+        break;
+
       case "delete":
         this.appState.contextMenu = false;
         this.handleDelete();
@@ -154,7 +158,12 @@ export class LogicLayer {
     return this.inputState.activeId;
   }
 
-  private handleDelete(): void {
+  private handleAnchor() {
+    const element = this.appState.getElementById(this.inputState.activeId!)!;
+    element.isAnchored = !element.isAnchored;
+  }
+
+  private handleDelete() {
     const deleteRecursively = (id: string) => {
       const element = this.appState.getElementById(id);
       if (!element) return;
@@ -176,12 +185,12 @@ export class LogicLayer {
     }
   }
 
-  private restartLayout(): void {
+  private restartLayout() {
     this.layout.stop();
     this.layout.start(this.appState.elements, this.appState.connections);
   }
 
-  private tryRestartLayout(): void {
+  private tryRestartLayout() {
     if (this.appState.autoLayout) {
       this.restartLayout();
     }

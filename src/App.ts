@@ -27,18 +27,10 @@ export class App {
       () => this.renderLayer.getActivePanelInputs()
     );
 
-    this.setupAsyncHandlers();
-
     this.start();
   }
 
-  private setupAsyncHandlers(): void {
-    this.inputLayer.handleDeleteConfirmed = (elementId: string) => {
-      this.inputState.interpretDelete(elementId);
-    };
-  }
-
-  private start(): void {
+  private start() {
     const updateLoop = () => {
       try {
         if (
@@ -64,7 +56,7 @@ export class App {
     return this.appState.serialize();
   }
 
-  load(data: string): void {
+  load(data: string) {
     try {
       this.appState.deserialize(data);
       this.renderLayer.render();

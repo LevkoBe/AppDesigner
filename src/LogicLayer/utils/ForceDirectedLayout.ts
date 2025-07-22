@@ -60,7 +60,7 @@ export class ForceDirectedLayout {
     };
   }
 
-  setCanvasElement(element: HTMLElement): void {
+  setCanvasElement(element: HTMLElement) {
     this.canvasElement = element;
   }
 
@@ -70,7 +70,7 @@ export class ForceDirectedLayout {
     return { x: rect.width / 2, y: rect.height / 2 };
   }
 
-  start(elements: AppElement[], connections: Connection[]): void {
+  start(elements: AppElement[], connections: Connection[]) {
     if (this.isRunning) return;
     this.isRunning = true;
 
@@ -96,7 +96,7 @@ export class ForceDirectedLayout {
     this.animate(elements, connections);
   }
 
-  stop(): void {
+  stop() {
     this.isRunning = false;
     if (this.animationId) cancelAnimationFrame(this.animationId);
   }
@@ -125,7 +125,7 @@ export class ForceDirectedLayout {
     );
   };
 
-  private calculateForces(elements: AppElement[]): void {
+  private calculateForces(elements: AppElement[]) {
     this.canvasCenter = this.getCanvasCenter();
 
     this.spatialHash.clear();
@@ -144,6 +144,8 @@ export class ForceDirectedLayout {
     });
 
     elements.forEach((e1) => {
+      if (e1.isAnchored) return;
+
       const f1 = this.forces.get(e1.id)!;
       const cellX = Math.floor(e1.x / this.config.spatialHashSize);
       const cellY = Math.floor(e1.y / this.config.spatialHashSize);
@@ -260,6 +262,8 @@ export class ForceDirectedLayout {
     let totalMovement = 0;
 
     elements.forEach((e) => {
+      if (e.isAnchored) return;
+
       const v = this.velocities.get(e.id)!;
       const mag = Math.sqrt(v.x * v.x + v.y * v.y);
 
@@ -307,7 +311,7 @@ export class ForceDirectedLayout {
     return totalMovement;
   }
 
-  updateConfig(newConfig: Partial<ForceDirectedConfig>): void {
+  updateConfig(newConfig: Partial<ForceDirectedConfig>) {
     this.config = { ...this.config, ...newConfig };
   }
 

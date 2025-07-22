@@ -177,8 +177,18 @@ export class InputState {
     this.text = text;
   }
 
-  interpretDelete(elementId: string) {
-    this.setAction("delete");
+  interpretActionOnElement(action: Action, elementId?: string) {
     this.activeId = elementId;
+    switch (action) {
+      case "delete":
+        this.setAction("delete");
+        this.activeId = elementId;
+        break;
+      case "anchor":
+        this.setAction("anchor");
+        break;
+      case "select":
+        break;
+    }
   }
 }

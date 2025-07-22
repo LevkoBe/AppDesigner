@@ -1,6 +1,6 @@
-import { InputState } from "./InputState.js";
-import { Action, ElementType, Mode } from "./types.js";
-import { AppElement } from "./models/Element.js";
+import { InputState } from "./InputState.ts";
+import { ElementType, Action, Mode } from "../types.ts";
+import { AppElement } from "../_models/AppElement.ts";
 
 export class InputLayer {
   constructor(
@@ -217,10 +217,19 @@ export class InputLayer {
 
   private handleKeyDown = (e: KeyboardEvent) => {
     const activeId = this.inputState.activeId;
-
-    if (activeId && e.key === "F2") {
-      this.inputState.interpretTextEdit(activeId);
-      return;
+    console.log(e.code);
+    if (activeId) {
+      switch (e.code) {
+        case "F2":
+          this.inputState.interpretTextEdit(activeId);
+          return;
+        case "Escape":
+          this.inputState.interpretActionOnElement("select", undefined);
+          break;
+        case "KeyA":
+          this.inputState.interpretActionOnElement("anchor", activeId);
+          break;
+      }
     }
 
     if (this.inputState.isEditing && activeId) {
@@ -233,10 +242,6 @@ export class InputLayer {
 
   resetConnectionState() {
     this.inputState.resetConnectionState();
-  }
-
-  handleDeleteConfirmed(elementId: string) {
-    this.inputState.interpretDelete(elementId);
   }
 
   private findElementAt(

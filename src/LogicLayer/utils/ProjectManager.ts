@@ -3,7 +3,7 @@ import { AppState } from "../AppState.ts";
 export class ProjectManager {
   constructor(private appState: AppState) {}
 
-  saveProject(): void {
+  saveProject() {
     const data = this.appState.serialize();
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);

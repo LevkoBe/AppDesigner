@@ -24,37 +24,37 @@ export class AppState {
   rerenderNeeded: boolean = false;
   autoLayout: boolean = true;
 
-  setMode(mode: Mode): void {
+  setMode(mode: Mode) {
     this.currentMode = mode;
   }
 
-  setElementType(type: ElementType): void {
+  setElementType(type: ElementType) {
     this.currentElementType = type;
   }
 
-  addElement(element: AppElement): void {
+  addElement(element: AppElement) {
     this.elements.push(element);
   }
 
-  removeElement(id: string): void {
+  removeElement(id: string) {
     const index = this.elements.findIndex((e) => e.id === id);
     if (index !== -1) {
       this.elements.splice(index, 1);
     }
   }
 
-  addConnection(connection: Connection): void {
+  addConnection(connection: Connection) {
     this.connections.push(connection);
   }
 
-  removeConnection(id: string): void {
+  removeConnection(id: string) {
     const index = this.connections.findIndex((c) => c.id === id);
     if (index !== -1) {
       this.connections.splice(index, 1);
     }
   }
 
-  removeConnectionsFor(id: string): void {
+  removeConnectionsFor(id: string) {
     this.connections = this.connections.filter(
       (conn) => conn.from.id !== id && conn.to.id !== id
     );
@@ -64,7 +64,7 @@ export class AppState {
     return this.elements.find((e) => e.id === id);
   }
 
-  selectElement(element: AppElement | undefined): void {
+  selectElement(element: AppElement | undefined) {
     if (this.selectedElement?.domElement) {
       this.selectedElement.domElement.classList.remove("selected");
     }
@@ -89,7 +89,7 @@ export class AppState {
     });
   }
 
-  deserialize(json: string): void {
+  deserialize(json: string) {
     const data = JSON.parse(json);
 
     this.clear();
@@ -147,7 +147,7 @@ export class AppState {
     );
   }
 
-  clear(): void {
+  clear() {
     this.elements = [];
     this.connections = [];
     this.selectedElement = undefined;
