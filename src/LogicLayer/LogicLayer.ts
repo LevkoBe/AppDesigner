@@ -97,6 +97,7 @@ export class LogicLayer {
         this.appState.zoom = this.inputState.zoom;
         this.appState.pan = this.inputState.pan;
         break;
+
       case "changeMode":
         this.appState.currentMode = this.inputState.currentMode;
         break;

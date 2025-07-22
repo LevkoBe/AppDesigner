@@ -329,6 +329,11 @@ export class RenderLayer {
   }
 
   setCanvasTransform(zoom: number, panX: number, panY: number) {
+    const inverseZoom = 1 / zoom;
+
+    this.canvas.style.width = `${100 * inverseZoom}%`;
+    this.canvas.style.height = `${100 * inverseZoom}%`;
+
     this.canvas.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
     this.canvas.style.transformOrigin = `0 0`;
   }

@@ -40,7 +40,7 @@ export class ForceDirectedLayout {
   ) {
     this.config = {
       repulsionForce: 2000,
-      attractionForce: 0.08,
+      attractionForce: 0.5,
       damping: 0.5,
       minDistance: BASE_UNIT,
       maxForce: 10,
