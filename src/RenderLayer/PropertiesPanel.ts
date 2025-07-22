@@ -22,6 +22,7 @@ export class PropertiesPanel {
       label
     );
   }
+
   private _createInputField(label: string): HTMLInputElement {
     const input = this._createElement(
       "inputFieldTemplate",
@@ -33,6 +34,7 @@ export class PropertiesPanel {
     input.autocomplete = "off";
     return input;
   }
+
   private _createElement(
     templateId: string,
     containerId: string,
@@ -43,9 +45,11 @@ export class PropertiesPanel {
       .getElementById(templateId)!
       .cloneNode(true) as HTMLElement;
     clone.id = "";
+
     clone.querySelector(".propLabel")!.textContent = label;
 
     document.getElementById(containerId)!.appendChild(clone);
+
     return clone.querySelector(keyelementClass)! as HTMLElement;
   }
 

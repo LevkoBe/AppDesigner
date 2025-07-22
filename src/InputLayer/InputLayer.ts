@@ -217,7 +217,6 @@ export class InputLayer {
 
   private handleKeyDown = (e: KeyboardEvent) => {
     const activeId = this.inputState.activeId;
-    console.log(e.code);
     if (activeId) {
       switch (e.code) {
         case "F2":
