@@ -56,6 +56,7 @@ export class LogicLayer {
         this.appState.contextMenu = false;
         this.handleDelete();
         this.tryRestartLayout();
+        activeId = undefined;
         break;
 
       case "edit":
