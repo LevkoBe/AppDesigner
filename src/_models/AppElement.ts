@@ -54,7 +54,7 @@ export class AppElement {
     const defaults: Record<ElementType, number> = {
       collection: 120,
       function: 100,
-      object: 100,
+      object: 90,
       input: 80,
       output: 80,
     };
@@ -65,7 +65,7 @@ export class AppElement {
     const defaults: Record<ElementType, number> = {
       collection: 80,
       function: 60,
-      object: 80,
+      object: 78,
       input: 40,
       output: 40,
     };
