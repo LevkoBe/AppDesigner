@@ -1,5 +1,5 @@
-import { AppElement } from "./models/Element.js";
-import { Action, ElementType, Point, Mode } from "./types.js";
+import { AppElement } from "../_models/AppElement.js";
+import { Action, ElementType, Point, Mode } from "../types.js";
 
 export class InputState {
   #action: Action = "none";

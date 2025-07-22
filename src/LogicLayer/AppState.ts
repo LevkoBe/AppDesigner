@@ -1,5 +1,5 @@
-import { AppElement } from "../models/Element.ts";
-import { Connection } from "../models/Connection.ts";
+import { AppElement } from "../_models/AppElement.ts";
+import { Connection } from "../_models/Connection.ts";
 import {
   ConnectionData,
   ElementData,

@@ -1,8 +1,8 @@
-import { InputState } from "./InputState.js";
-import { LogicLayer } from "./LogicLayer.js";
-import { RenderLayer } from "./RenderLayer.js";
-import { InputLayer } from "./InputLayer.js";
-import { AppState } from "./state/AppState.js";
+import { InputState } from "./InputLayer/InputState.js";
+import { LogicLayer } from "./LogicLayer/LogicLayer.js";
+import { RenderLayer } from "./RenderLayer/RenderLayer.js";
+import { InputLayer } from "./InputLayer/InputLayer.js";
+import { AppState } from "./LogicLayer/AppState.js";
 
 export class App {
   private appState: AppState;

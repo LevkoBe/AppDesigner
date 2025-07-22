@@ -1,9 +1,9 @@
 import { Mode } from "fs";
-import { Connection } from "./models/Connection.js";
-import { AppElement } from "./models/Element.js";
-import { AppState } from "./state/AppState.js";
-import { PropertiesPanel } from "./ui/PropertiesPanel.js";
-import { ElementType } from "./types.js";
+import { Connection } from "../_models/Connection.js";
+import { AppElement } from "../_models/AppElement.js";
+import { AppState } from "../LogicLayer/AppState.js";
+import { PropertiesPanel } from "./PropertiesPanel.js";
+import { ElementType } from "../types.js";
 
 export class RenderLayer {
   private elementMap = new Map<string, HTMLElement>();

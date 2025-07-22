@@ -1,4 +1,4 @@
-import { AppElement } from "./Element.ts";
+import { AppElement } from "./AppElement.ts";
 import { ConnectionData } from "../types.ts";
 
 export class Connection {

@@ -1,8 +1,8 @@
-import { InputState } from "./InputState.js";
-import { ForceDirectedLayout } from "./layout/ForceDirectedLayout.js";
-import { Connection } from "./models/Connection.js";
-import { AppElement } from "./models/Element.js";
-import { AppState } from "./state/AppState.js";
+import { InputState } from "../InputLayer/InputState.js";
+import { ForceDirectedLayout } from "./utils/ForceDirectedLayout.js";
+import { Connection } from "../_models/Connection.js";
+import { AppElement } from "../_models/AppElement.js";
+import { AppState } from "./AppState.js";
 import { ProjectManager } from "./utils/ProjectManager.js";
 
 export class LogicLayer {

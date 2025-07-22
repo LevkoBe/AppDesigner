@@ -1,5 +1,5 @@
-import { AppState } from "../state/AppState.ts";
-import { AppElement } from "../models/Element.ts";
+import { AppState } from "../LogicLayer/AppState.ts";
+import { AppElement } from "../_models/AppElement.ts";
 
 export class PropertiesPanel {
   private appState: AppState;

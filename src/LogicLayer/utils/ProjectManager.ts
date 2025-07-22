@@ -1,4 +1,4 @@
-import { AppState } from "../state/AppState.ts";
+import { AppState } from "../AppState.ts";
 
 export class ProjectManager {
   constructor(private appState: AppState) {}

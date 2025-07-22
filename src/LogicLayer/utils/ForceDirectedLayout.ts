@@ -1,6 +1,6 @@
-import { AppElement } from "../models/Element.ts";
-import { Connection } from "../models/Connection.ts";
-import { Point } from "../types.ts";
+import { AppElement } from "../../_models/AppElement.ts";
+import { Connection } from "../../_models/Connection.ts";
+import { Point } from "../../types.ts";
 
 export interface ForceDirectedConfig {
   repulsionForce: number;
