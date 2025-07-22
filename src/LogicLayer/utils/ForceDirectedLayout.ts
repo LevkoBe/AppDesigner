@@ -3,206 +3,308 @@ import { Connection } from "../../_models/Connection.ts";
 import { Point } from "../../types.ts";
 
 export interface ForceDirectedConfig {
-  repulsionForce: number;
-  attractionForce: number;
-  damping: number;
-  minDistance: number;
-  maxForce: number;
-  iterations: number;
-  springLength: number;
+  repulsionForce: number; // The strength of the repulsive force between elements. Higher values push elements further apart.
+  attractionForce: number; // The strength of the attractive force between connected elements (spring force). Higher values pull connected elements closer.
+  damping: number; // Reduces the velocity of elements over time, preventing perpetual motion and helping the simulation settle.
+  minDistance: number; // The minimum distance between elements before repulsion significantly increases.
+  maxForce: number; // The maximum force that can be applied to an element in a single iteration, preventing erratic movement.
+  iterations: number; // The number of simulation steps to run per animation frame. More iterations lead to faster convergence but higher CPU usage.
+  springLength: number; // The ideal length of the "spring" between connected elements. Elements will try to maintain this distance.
+  movementThreshold: number; // The minimum movement an element must have in an iteration for its position to be updated. Helps in stabilizing the layout.
+  stopThreshold: number; // The total movement threshold for all elements. If the total movement falls below this, the simulation stops.
+  gridForce: number; // The strength of the force that pulls elements towards the nearest grid intersection.
+  centerAttractionForce: number; // The strength of the force that pulls all elements towards the center of the canvas.
+  gridSize: number; // The size of the grid cells. Elements will try to align to this grid.
+  spatialHashSize: number; // The size of the cells used in the spatial hash for optimizing repulsion force calculations.
+  maxRepulsionDistance: number; // The maximum distance over which repulsion forces are calculated. Beyond this, elements don't repel each other.
+  connectionGridAlignForce: number; // The strength of the force that aligns connected elements to the grid, particularly when they are nearly horizontal or vertical.
+  gridRepulsionFactor: number; // A multiplier applied to the repulsion force when elements are closely aligned with the grid, encouraging grid-based spacing.
+  perfectAlignmentThreshold: number; // The distance threshold within which an element is considered "perfectly aligned" to a grid line, leading to snapping.
 }
+
+const BASE_UNIT = 125;
 
 export class ForceDirectedLayout {
   private config: ForceDirectedConfig;
-  private velocities: Map<string, Point> = new Map();
-  private isRunning: boolean = false;
-  private animationId: number | undefined = undefined;
+  private velocities = new Map<string, Point>();
+  private forces = new Map<string, Point>();
+  private spatialHash = new Map<string, AppElement[]>();
+  private connectionMap = new Map<string, AppElement[]>();
+  private isRunning = false;
+  private animationId?: number;
+  private canvasCenter = { x: 0, y: 0 };
 
-  constructor(config: Partial<ForceDirectedConfig> = {}) {
+  constructor(
+    private canvasElement: HTMLElement,
+    config: Partial<ForceDirectedConfig> = {}
+  ) {
     this.config = {
-      repulsionForce: 1000,
-      attractionForce: 0.1,
-      damping: 0.9,
-      minDistance: 50,
+      repulsionForce: 2000,
+      attractionForce: 0.08,
+      damping: 0.5,
+      minDistance: BASE_UNIT,
       maxForce: 10,
       iterations: 1,
-      springLength: 100,
+      springLength: BASE_UNIT,
+      movementThreshold: 0.1,
+      stopThreshold: 0.05,
+      gridForce: 0.08,
+      centerAttractionForce: 0.005,
+      gridSize: BASE_UNIT,
+      spatialHashSize: 300,
+      maxRepulsionDistance: 250,
+      connectionGridAlignForce: 0.1,
+      gridRepulsionFactor: 0.5,
+      perfectAlignmentThreshold: 5,
       ...config,
     };
   }
 
+  setCanvasElement(element: HTMLElement): void {
+    this.canvasElement = element;
+  }
+
+  private getCanvasCenter(): Point {
+    if (!this.canvasElement) return { x: 0, y: 0 };
+    const rect = this.canvasElement.getBoundingClientRect();
+    return { x: rect.width / 2, y: rect.height / 2 };
+  }
+
   start(elements: AppElement[], connections: Connection[]): void {
     if (this.isRunning) return;
-
     this.isRunning = true;
-    this.initializeVelocities(elements);
+
+    this.velocities.clear();
+    this.forces.clear();
+    elements.forEach((e) => {
+      this.velocities.set(e.id, { x: 0, y: 0 });
+      this.forces.set(e.id, { x: 0, y: 0 });
+    });
+
+    this.connectionMap.clear();
+    connections.forEach((c) => {
+      if (!this.connectionMap.has(c.from.id)) {
+        this.connectionMap.set(c.from.id, []);
+      }
+      if (!this.connectionMap.has(c.to.id)) {
+        this.connectionMap.set(c.to.id, []);
+      }
+      this.connectionMap.get(c.from.id)!.push(c.to);
+      this.connectionMap.get(c.to.id)!.push(c.from);
+    });
+
     this.animate(elements, connections);
   }
 
   stop(): void {
     this.isRunning = false;
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = undefined;
-    }
+    if (this.animationId) cancelAnimationFrame(this.animationId);
   }
 
-  step(elements: AppElement[], connections: Connection[]): void {
-    if (elements.length === 0) return;
+  step(elements: AppElement[]): number {
+    if (!elements.length) return 0;
 
-    const validConnections = connections.filter(
-      (connection) =>
-        elements.some((e) => e.id === connection.from.id) &&
-        elements.some((e) => e.id === connection.to.id)
-    );
-
+    let totalMovement = 0;
     for (let i = 0; i < this.config.iterations; i++) {
-      this.calculateForces(elements, validConnections);
-      this.updatePositions(elements);
+      this.calculateForces(elements);
+      totalMovement = this.updatePositions(elements);
     }
+    return totalMovement;
   }
 
-  private animate = (
-    elements: AppElement[],
-    connections: Connection[]
-  ): void => {
+  private animate = (elements: AppElement[], connections: Connection[]) => {
     if (!this.isRunning) return;
 
-    this.step(elements, connections);
+    if (this.step(elements) < this.config.stopThreshold) {
+      this.stop();
+      return;
+    }
 
-    this.animationId = requestAnimationFrame(() => {
-      this.animate(elements, connections);
-    });
+    this.animationId = requestAnimationFrame(() =>
+      this.animate(elements, connections)
+    );
   };
 
-  private initializeVelocities(elements: AppElement[]): void {
-    this.velocities.clear();
-    elements.forEach((element) => {
-      this.velocities.set(element.id, { x: 0, y: 0 });
+  private calculateForces(elements: AppElement[]): void {
+    this.canvasCenter = this.getCanvasCenter();
+
+    this.spatialHash.clear();
+    elements.forEach((e) => {
+      const key = `${Math.floor(
+        e.x / this.config.spatialHashSize
+      )},${Math.floor(e.y / this.config.spatialHashSize)}`;
+      (
+        this.spatialHash.get(key) || this.spatialHash.set(key, []).get(key)!
+      ).push(e);
+    });
+
+    elements.forEach((e) => {
+      const f = this.forces.get(e.id)!;
+      f.x = f.y = 0;
+    });
+
+    elements.forEach((e1) => {
+      const f1 = this.forces.get(e1.id)!;
+      const cellX = Math.floor(e1.x / this.config.spatialHashSize);
+      const cellY = Math.floor(e1.y / this.config.spatialHashSize);
+
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const nearby = this.spatialHash.get(`${cellX + dx},${cellY + dy}`);
+          if (!nearby) continue;
+
+          nearby.forEach((e2) => {
+            if (e1.id === e2.id) return;
+            const deltaX = e1.x - e2.x;
+            const deltaY = e1.y - e2.y;
+            const distSq = deltaX * deltaX + deltaY * deltaY;
+
+            if (distSq > this.config.maxRepulsionDistance ** 2) return;
+            if (distSq === 0) {
+              f1.x += Math.random() - 0.5;
+              f1.y += Math.random() - 0.5;
+              return;
+            }
+
+            const dist = Math.sqrt(distSq);
+            let force = this.config.repulsionForce / distSq;
+
+            if (dist < this.config.minDistance) {
+              force +=
+                (this.config.minDistance - dist) *
+                this.config.repulsionForce *
+                0.01;
+            }
+
+            const isAlignedX =
+              Math.abs(deltaX % this.config.gridSize) < 5 ||
+              Math.abs(deltaX % this.config.gridSize) >
+                this.config.gridSize - 5;
+            const isAlignedY =
+              Math.abs(deltaY % this.config.gridSize) < 5 ||
+              Math.abs(deltaY % this.config.gridSize) >
+                this.config.gridSize - 5;
+
+            if (isAlignedX || isAlignedY) {
+              force *= this.config.gridRepulsionFactor;
+            }
+
+            f1.x += (deltaX / dist) * force;
+            f1.y += (deltaY / dist) * force;
+          });
+        }
+      }
+
+      this.connectionMap.get(e1.id)?.forEach((e2) => {
+        const dx = e2.x - e1.x;
+        const dy = e2.y - e1.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist === 0) return;
+
+        const springForce =
+          (dist - this.config.springLength) * this.config.attractionForce;
+        f1.x += (dx / dist) * springForce;
+        f1.y += (dy / dist) * springForce;
+
+        const angle = Math.atan2(dy, dx);
+        const angleThreshold = (10 * Math.PI) / 180;
+
+        if (
+          Math.abs(angle) < angleThreshold ||
+          Math.abs(angle - Math.PI) < angleThreshold
+        ) {
+          const targetY =
+            Math.round(e1.y / this.config.gridSize) * this.config.gridSize;
+          f1.y += (targetY - e1.y) * this.config.connectionGridAlignForce;
+          const targetY2 =
+            Math.round(e2.y / this.config.gridSize) * this.config.gridSize;
+          this.forces.get(e2.id)!.y +=
+            (targetY2 - e2.y) * this.config.connectionGridAlignForce;
+        } else if (
+          Math.abs(angle - Math.PI / 2) < angleThreshold ||
+          Math.abs(angle + Math.PI / 2) < angleThreshold
+        ) {
+          const targetX =
+            Math.round(e1.x / this.config.gridSize) * this.config.gridSize;
+          f1.x += (targetX - e1.x) * this.config.connectionGridAlignForce;
+          const targetX2 =
+            Math.round(e2.x / this.config.gridSize) * this.config.gridSize;
+          this.forces.get(e2.id)!.x +=
+            (targetX2 - e2.x) * this.config.connectionGridAlignForce;
+        }
+      });
+
+      const targetX =
+        Math.round(e1.x / this.config.gridSize) * this.config.gridSize;
+      const targetY =
+        Math.round(e1.y / this.config.gridSize) * this.config.gridSize;
+      f1.x += (targetX - e1.x) * this.config.gridForce;
+      f1.y += (targetY - e1.y) * this.config.gridForce;
+
+      f1.x += (this.canvasCenter.x - e1.x) * this.config.centerAttractionForce;
+      f1.y += (this.canvasCenter.y - e1.y) * this.config.centerAttractionForce;
+
+      const forceMag = Math.sqrt(f1.x * f1.x + f1.y * f1.y);
+      if (forceMag > this.config.maxForce) {
+        f1.x = (f1.x / forceMag) * this.config.maxForce;
+        f1.y = (f1.y / forceMag) * this.config.maxForce;
+      }
+
+      const v = this.velocities.get(e1.id)!;
+      v.x = (v.x + f1.x) * this.config.damping;
+      v.y = (v.y + f1.y) * this.config.damping;
     });
   }
 
-  private calculateForces(
-    elements: AppElement[],
-    connections: Connection[]
-  ): void {
-    const forces = new Map<string, Point>();
+  private updatePositions(elements: AppElement[]): number {
+    let totalMovement = 0;
 
-    elements.forEach((element) => {
-      forces.set(element.id, { x: 0, y: 0 });
-    });
+    elements.forEach((e) => {
+      const v = this.velocities.get(e.id)!;
+      const mag = Math.sqrt(v.x * v.x + v.y * v.y);
 
-    for (let i = 0; i < elements.length; i++) {
-      for (let j = i + 1; j < elements.length; j++) {
-        const force = this.calculateRepulsionForce(elements[i], elements[j]);
-
-        const force1 = forces.get(elements[i].id)!;
-        const force2 = forces.get(elements[j].id)!;
-
-        force1.x += force.x;
-        force1.y += force.y;
-        force2.x -= force.x;
-        force2.y -= force.y;
-      }
-    }
-
-    connections.forEach((connection) => {
-      const fromForce = forces.get(connection.from.id);
-      const toForce = forces.get(connection.to.id);
-
-      if (fromForce && toForce) {
-        const force = this.calculateAttractionForce(
-          connection.from,
-          connection.to
-        );
-
-        fromForce.x += force.x;
-        fromForce.y += force.y;
-        toForce.x -= force.x;
-        toForce.y -= force.y;
-      }
-    });
-
-    elements.forEach((element) => {
-      const force = forces.get(element.id)!;
-      const velocity = this.velocities.get(element.id)!;
-
-      const forceMagnitude = Math.sqrt(force.x * force.x + force.y * force.y);
-      if (forceMagnitude > this.config.maxForce) {
-        force.x = (force.x / forceMagnitude) * this.config.maxForce;
-        force.y = (force.y / forceMagnitude) * this.config.maxForce;
+      if (mag > this.config.movementThreshold) {
+        e.x += v.x;
+        e.y += v.y;
       }
 
-      velocity.x = (velocity.x + force.x) * this.config.damping;
-      velocity.y = (velocity.y + force.y) * this.config.damping;
-    });
-  }
+      const remainderX = e.x % this.config.gridSize;
+      const remainderY = e.y % this.config.gridSize;
 
-  private calculateRepulsionForce(
-    element1: AppElement,
-    element2: AppElement
-  ): Point {
-    const dx = element1.x - element2.x;
-    const dy = element1.y - element2.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+      const nearGridX =
+        Math.abs(remainderX) < this.config.perfectAlignmentThreshold ||
+        Math.abs(remainderX - this.config.gridSize) <
+          this.config.perfectAlignmentThreshold ||
+        Math.abs(remainderX + this.config.gridSize) <
+          this.config.perfectAlignmentThreshold;
 
-    if (distance < this.config.minDistance) {
-      const angle = Math.atan2(dy, dx);
-      return {
-        x:
-          (Math.cos(angle) * this.config.repulsionForce) /
-          this.config.minDistance,
-        y:
-          (Math.sin(angle) * this.config.repulsionForce) /
-          this.config.minDistance,
-      };
-    }
+      const nearGridY =
+        Math.abs(remainderY) < this.config.perfectAlignmentThreshold ||
+        Math.abs(remainderY - this.config.gridSize) <
+          this.config.perfectAlignmentThreshold ||
+        Math.abs(remainderY + this.config.gridSize) <
+          this.config.perfectAlignmentThreshold;
 
-    if (distance === 0) {
-      return {
-        x: Math.random() * 2 - 1,
-        y: Math.random() * 2 - 1,
-      };
-    }
+      if (nearGridX) {
+        const snappedX =
+          Math.round(e.x / this.config.gridSize) * this.config.gridSize;
+        if (Math.abs(snappedX - e.x) > 0.01) {
+          totalMovement += Math.abs(snappedX - e.x);
+          e.x = snappedX;
+        }
+      }
 
-    const force = this.config.repulsionForce / (distance * distance);
-    return {
-      x: (dx / distance) * force,
-      y: (dy / distance) * force,
-    };
-  }
-
-  private calculateAttractionForce(
-    element1: AppElement,
-    element2: AppElement
-  ): Point {
-    const dx = element2.x - element1.x;
-    const dy = element2.y - element1.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance === 0) return { x: 0, y: 0 };
-
-    const displacement = distance - this.config.springLength;
-    const force = displacement * this.config.attractionForce;
-
-    return {
-      x: (dx / distance) * force,
-      y: (dy / distance) * force,
-    };
-  }
-
-  private updatePositions(elements: AppElement[]): void {
-    elements.forEach((element) => {
-      const velocity = this.velocities.get(element.id)!;
-
-      element.x = element.x + velocity.x;
-      element.y = element.y + velocity.y;
-
-      if (element.domElement) {
-        element.domElement.style.left = `${element.cornerX}px`;
-        element.domElement.style.top = `${element.cornerY}px`;
+      if (nearGridY) {
+        const snappedY =
+          Math.round(e.y / this.config.gridSize) * this.config.gridSize;
+        if (Math.abs(snappedY - e.y) > 0.01) {
+          totalMovement += Math.abs(snappedY - e.y);
+          e.y = snappedY;
+        }
       }
     });
+
+    return totalMovement;
   }
 
   updateConfig(newConfig: Partial<ForceDirectedConfig>): void {

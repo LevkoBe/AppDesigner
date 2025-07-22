@@ -9,9 +9,13 @@ export class LogicLayer {
   private projectManager: ProjectManager;
   private layout: ForceDirectedLayout;
 
-  constructor(private inputState: InputState, private appState: AppState) {
+  constructor(
+    private inputState: InputState,
+    private appState: AppState,
+    canvasElement: HTMLCanvasElement
+  ) {
     this.projectManager = new ProjectManager(appState);
-    this.layout = new ForceDirectedLayout();
+    this.layout = new ForceDirectedLayout(canvasElement);
   }
 
   processInput() {

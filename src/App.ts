@@ -14,7 +14,11 @@ export class App {
   constructor(canvasElement: HTMLCanvasElement) {
     this.appState = new AppState();
     this.inputState = new InputState();
-    this.logicLayer = new LogicLayer(this.inputState, this.appState);
+    this.logicLayer = new LogicLayer(
+      this.inputState,
+      this.appState,
+      canvasElement
+    );
     this.renderLayer = new RenderLayer(canvasElement, this.appState);
     this.inputLayer = new InputLayer(
       canvasElement,
