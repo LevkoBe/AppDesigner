@@ -149,7 +149,8 @@ body {
   border-color: rgba(var(--rgb-gray-100), 0.9);
 }
 
-.mode-btn.active {
+.mode-btn.active,
+.control-btn.active {
   background: linear-gradient(
     145deg,
     var(--color-blue-dark) 0%,
@@ -209,11 +210,6 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: radial-gradient(
-    circle at 20% 20%,
-    rgba(var(--rgb-gray-10), 0.9) 0%,
-    rgba(var(--rgb-gray-20), 0.9) 100%
-  );
   border-radius: 10px;
   margin: 10px;
   box-shadow: var(--shadow-inset-canvas),
@@ -224,16 +220,6 @@ body {
   width: 100%;
   height: 100%;
   cursor: crosshair;
-  background: radial-gradient(
-      circle at 25% 25%,
-      rgba(var(--rgb-white), 0.05) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 75% 75%,
-      rgba(var(--rgb-white), 0.03) 0%,
-      transparent 50%
-    );
   position: relative;
 }
 
@@ -347,15 +333,13 @@ body {
 }
 
 .object {
-  clip-path: polygon(50% 0%, 90% 25%, 90% 75%, 50% 100%, 10% 75%, 10% 25%);
-  min-width: 120px;
-  min-height: 100px;
+  clip-path: polygon(100% 50%, 75% 100%, 25% 100%, 0% 50%, 25% 0%, 75% 0%);
   background: linear-gradient(
     145deg,
     rgba(var(--rgb-object-base-start), 0.9) 0%,
     rgba(var(--rgb-object-base-end), 0.9) 100%
   );
-  border-color: rgba(var(--rgb-object-border-base), 0.8);
+  border: none;
 }
 
 .input,
