@@ -6,6 +6,8 @@
     <title>Application Designer</title>
     <link rel="stylesheet" href="./styles/index.css" />
     <link rel="stylesheet" href="./styles/bars.css" />
+    <link rel="stylesheet" href="./styles/elements.css" />
+    <link rel="stylesheet" href="./styles/connections.css" />
   </head>
   <body>
     <div class="container">
@@ -104,6 +106,90 @@
       <div class="context-menu-item" id="duplicateBtn">Duplicate</div>
       <div class="context-menu-separator"></div>
       <div class="context-menu-item" id="deleteBtn">Delete</div>
+    </div>
+
+    <div id="elementTemplates" style="display: none">
+      <div class="element template collection">
+        <svg
+          width="173"
+          height="165"
+          viewBox="0 0 173 165"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="element-svg"
+        >
+          <path
+            d="M128.25 8H165.5V157H128.25M45.25 157H8V8H45.25"
+            class="element-svg"
+          />
+        </svg>
+
+        <span class="element-text"></span>
+        <input type="text" class="element-input" />
+      </div>
+      <div class="element template function">
+        <svg
+          width="441"
+          height="159"
+          viewBox="0 0 441 159"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="element-svg"
+        >
+          <path
+            d="M408.319 5C442.077 48.9303 442.077 110.07 408.319 154M33.3189 154C-0.439621 110.07 -0.439621 48.9303 33.3189 5"
+          />
+        </svg>
+
+        <span class="element-text"></span>
+        <input type="text" class="element-input" />
+      </div>
+      <div class="element template object">
+        <svg
+          width="197"
+          height="165"
+          viewBox="0 0 197 165"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="element-svg"
+        >
+          <path
+            d="M126 8H142.25C153.848 8 163.25 17.402 163.25 29V45.25C163.25 45.25 163.25 82.5 197 82.5C163.25 82.5 163.25 119.75 163.25 119.75V136C163.25 147.598 153.848 157 142.25 157H126M71 157H54.75C43.152 157 33.75 147.598 33.75 136V119.75C33.75 119.75 33.75 82.5 0 82.5C33.75 82.5 33.75 45.25 33.75 45.25V29C33.75 17.402 43.152 8 54.75 8H71"
+          />
+        </svg>
+        <span class="element-text"></span>
+        <input type="text" class="element-input" />
+      </div>
+      <div class="element template input">
+        <svg
+          width="214"
+          height="161"
+          viewBox="0 0 214 161"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="element-svg"
+        >
+          <path d="M5 6L80 80.5L5 155M128 6L203 80.5L128 155" />
+        </svg>
+
+        <span class="element-text"></span>
+        <input type="text" class="element-input" />
+      </div>
+      <div class="element template output">
+        <svg
+          width="214"
+          height="161"
+          viewBox="0 0 214 161"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="element-svg"
+        >
+          <path d="M209 155L134 80.5L209 6M86 155L11 80.5L86 6" />
+        </svg>
+
+        <span class="element-text"></span>
+        <input type="text" class="element-input" />
+      </div>
     </div>
 
     <script src="/src/_customHTML/dropdown.ts"></script>
