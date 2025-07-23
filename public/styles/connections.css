@@ -1,0 +1,20 @@
+.connection-svg {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.connection-line {
+  stroke: rgba(var(--rgb-gray-150), 0.9);
+  stroke-width: 3;
+  fill: none;
+  filter: drop-shadow(0 0 8px rgba(var(--rgb-gray-150), 0.5));
+  transition: stroke 0.3s ease, stroke-width 0.3s ease;
+}
+
+.connection-svg:hover .connection-line {
+  stroke: var(--color-blue-primary);
+  stroke-width: 4;
+  filter: drop-shadow(0 0 10px rgba(var(--rgb-blue-primary), 0.6));
+}

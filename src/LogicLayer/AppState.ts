@@ -65,13 +65,7 @@ export class AppState {
   }
 
   selectElement(element: AppElement | undefined) {
-    if (this.selectedElement?.domElement) {
-      this.selectedElement.domElement.classList.remove("selected");
-    }
     this.selectedElement = element;
-    if (element?.domElement) {
-      element.domElement.classList.add("selected");
-    }
   }
 
   hasConnection(fromId: string, toId: string): boolean {

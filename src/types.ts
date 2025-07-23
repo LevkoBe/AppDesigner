@@ -1,9 +1,12 @@
-export type ElementType =
-  | "collection"
-  | "function"
-  | "object"
-  | "input"
-  | "output";
+export const elementTypeList = [
+  "collection",
+  "function",
+  "object",
+  "input",
+  "output",
+] as const;
+export type ElementType = (typeof elementTypeList)[number];
+
 export type Mode = "create" | "connect" | "move" | "edit";
 export type Action =
   | "create"

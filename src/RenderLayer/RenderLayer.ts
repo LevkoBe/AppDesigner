@@ -4,14 +4,17 @@ import { AppElement } from "../_models/AppElement.js";
 import { AppState } from "../LogicLayer/AppState.js";
 import { PropertiesPanel } from "./PropertiesPanel.js";
 import { ElementType } from "../types.js";
+import { ElementFactory } from "./ElementFactory.js";
 
 export class RenderLayer {
   private elementMap = new Map<string, HTMLElement>();
   private connectionMap = new Map<string, SVGElement>();
   private propertiesPanel: PropertiesPanel;
+  private elementFactory: ElementFactory;
 
   constructor(private canvas: HTMLElement, private state: AppState) {
     this.propertiesPanel = new PropertiesPanel(state);
+    this.elementFactory = new ElementFactory();
   }
 
   render() {
@@ -47,116 +50,24 @@ export class RenderLayer {
       let domElement = this.elementMap.get(element.id);
 
       if (!domElement) {
-        domElement = this.createElementDOM(element);
+        domElement = this.elementFactory.createDOMElement(element, this.canvas);
         this.elementMap.set(element.id, domElement);
       }
 
       const isSelected = element.id === selectedId;
       const isEditing = this.state.editingElement?.id === element.id;
-      const isConnectionSource = this.state.fromElement?.id === element.id;
+      const isActive = this.state.fromElement?.id === element.id;
 
-      this.updateElementDOM(domElement, element);
+      this.elementFactory.updateElement(domElement, element);
 
-      if (isSelected) {
-        domElement.classList.add("selected");
-      } else {
-        domElement.classList.remove("selected");
-      }
-
-      if (isConnectionSource) {
-        domElement.classList.add("connection-source");
-      } else {
-        domElement.classList.remove("connection-source");
-      }
-
-      this.updateEditingState(domElement, element, isEditing);
+      this.elementFactory.updateSelectedState(domElement, isSelected);
+      this.elementFactory.updateIsActiveState(domElement, isActive);
+      this.elementFactory.updateEditingState(domElement, element, isEditing);
     });
 
     const pos = this.state.targetPosition;
     if (this.state.contextMenu && pos) this.showContextMenu(pos.x, pos.y);
     else this.hideContextMenu();
-  }
-
-  private createElementDOM(element: AppElement): HTMLElement {
-    const div = document.createElement("div");
-    div.className = `element ${element.type}`;
-    div.dataset.id = element.id;
-
-    const textSpan = document.createElement("span");
-    textSpan.className = "element-text";
-    div.appendChild(textSpan);
-
-    const input = document.createElement("input");
-    input.className = "element-input";
-    input.type = "text";
-    input.style.display = "none";
-    input.style.background = "rgba(0, 0, 0, 0.4)";
-    input.style.border = "1px solid #444";
-    input.style.borderRadius = "4px";
-    input.style.outline = "none";
-    input.style.color = "#eee";
-    input.style.font = "inherit";
-    input.style.textAlign = "center";
-    input.style.width = "calc(100% - 10px)";
-    input.style.padding = "2px 5px";
-    input.style.boxSizing = "border-box";
-    input.style.textShadow = "0 0 3px rgba(0,0,0,0.7)";
-
-    div.appendChild(input);
-
-    this.updateElementDOM(div, element);
-    this.canvas.appendChild(div);
-
-    return div;
-  }
-
-  private updateElementDOM(domElement: HTMLElement, element: AppElement) {
-    domElement.style.left = element.x - element.width / 2 + "px";
-    domElement.style.top = element.y - element.height / 2 + "px";
-    domElement.style.width = element.width + "px";
-    domElement.style.height = element.height + "px";
-
-    const textSpan = domElement.querySelector(".element-text") as HTMLElement;
-    const input = domElement.querySelector(
-      ".element-input"
-    ) as HTMLInputElement;
-    if (textSpan) {
-      textSpan.textContent = element.text;
-    }
-
-    if (input) {
-      input.value = element.text;
-    }
-
-    if (element.parent) {
-      domElement.classList.add("has-parent");
-    } else {
-      domElement.classList.remove("has-parent");
-    }
-  }
-
-  private updateEditingState(
-    domElement: HTMLElement,
-    element: AppElement,
-    isEditing: boolean
-  ) {
-    const textSpan = domElement.querySelector(".element-text") as HTMLElement;
-    const input = domElement.querySelector(
-      ".element-input"
-    ) as HTMLInputElement;
-
-    if (textSpan && input) {
-      if (isEditing) {
-        textSpan.style.display = "none";
-        input.style.display = "block";
-        input.focus();
-        input.value = element.text;
-      } else {
-        textSpan.style.display = "block";
-        input.style.display = "none";
-        textSpan.textContent = element.text;
-      }
-    }
   }
 
   private renderConnections(connections: Connection[]) {
@@ -177,38 +88,23 @@ export class RenderLayer {
       let svgElement = this.connectionMap.get(connection.id);
 
       if (!svgElement) {
-        svgElement = this.createConnectionDOM(fromElement, toElement);
+        svgElement = this.createConnectionDOM();
         this.connectionMap.set(connection.id, svgElement);
-      } else {
-        this.updateConnectionDOM(svgElement, fromElement, toElement);
       }
+      this.updateConnectionDOM(svgElement, fromElement, toElement);
     });
   }
 
-  private createConnectionDOM(
-    fromElement: AppElement,
-    toElement: AppElement
-  ): SVGElement {
+  private createConnectionDOM(): SVGElement {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.classList.add("connection-svg");
-    svg.style.position = "absolute";
-    svg.style.pointerEvents = "none";
-    svg.style.zIndex = "1";
 
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.classList.add("connection-line");
 
-    const arrow = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polygon"
-    );
-    arrow.classList.add("connection-arrow");
-
     svg.appendChild(line);
-    svg.appendChild(arrow);
     this.canvas.appendChild(svg);
 
-    this.updateConnectionDOM(svg, fromElement, toElement);
     return svg;
   }
 
@@ -218,46 +114,33 @@ export class RenderLayer {
     toElement: AppElement
   ) {
     const line = svg.querySelector("line") as SVGLineElement;
-    const arrow = svg.querySelector("polygon") as SVGPolygonElement;
-    if (!line || !arrow) return;
+    if (!line) return;
 
     const fromX = fromElement.x;
     const fromY = fromElement.y;
     const toX = toElement.x;
     const toY = toElement.y;
 
-    const minX = Math.min(fromX, toX) - 20;
-    const minY = Math.min(fromY, toY) - 20;
-    const maxX = Math.max(fromX, toX) + 20;
-    const maxY = Math.max(fromY, toY) + 20;
+    const padding = 20;
+    const minX = Math.min(fromX, toX) - padding;
+    const minY = Math.min(fromY, toY) - padding;
+    const maxX = Math.max(fromX, toX) + padding;
+    const maxY = Math.max(fromY, toY) + padding;
 
     svg.style.left = minX + "px";
     svg.style.top = minY + "px";
     svg.style.width = maxX - minX + "px";
     svg.style.height = maxY - minY + "px";
 
-    line.setAttribute("x1", (fromX - minX).toString());
-    line.setAttribute("y1", (fromY - minY).toString());
-    line.setAttribute("x2", (toX - minX).toString());
-    line.y2.baseVal.value = toY - minY;
+    const lineX1 = fromX - minX;
+    const lineY1 = fromY - minY;
+    const lineX2 = toX - minX;
+    const lineY2 = toY - minY;
 
-    const angle = Math.atan2(toY - fromY, toX - fromX);
-    const arrowSize = 8;
-    const endX = toX - minX;
-    const endY = toY - minY;
-
-    const adjustedEndX = endX - Math.cos(angle) * (arrowSize / 2);
-    const adjustedEndY = endY - Math.sin(angle) * (arrowSize / 2);
-
-    const p1x = adjustedEndX - arrowSize * Math.cos(angle - Math.PI / 6);
-    const p1y = adjustedEndY - arrowSize * Math.sin(angle - Math.PI / 6);
-    const p2x = adjustedEndX - arrowSize * Math.cos(angle + Math.PI / 6);
-    const p2y = adjustedEndY - arrowSize * Math.sin(angle + Math.PI / 6);
-
-    arrow.setAttribute(
-      "points",
-      `${adjustedEndX},${adjustedEndY} ${p1x},${p1y} ${p2x},${p2y}`
-    );
+    line.setAttribute("x1", lineX1.toString());
+    line.setAttribute("y1", lineY1.toString());
+    line.setAttribute("x2", lineX2.toString());
+    line.setAttribute("y2", lineY2.toString());
   }
 
   showContextMenu(x: number, y: number) {
@@ -336,5 +219,12 @@ export class RenderLayer {
 
     this.canvas.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
     this.canvas.style.transformOrigin = `0 0`;
+  }
+
+  updateElementDraggingState(elementId: string, isDragging: boolean) {
+    const domElement = this.elementMap.get(elementId);
+    if (domElement) {
+      this.elementFactory.updateDraggingState(domElement, isDragging);
+    }
   }
 }

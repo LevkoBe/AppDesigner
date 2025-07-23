@@ -52,7 +52,7 @@ export class AppElement {
 
   private getDefaultWidth(): number {
     const defaults: Record<ElementType, number> = {
-      collection: 120,
+      collection: 90,
       function: 100,
       object: 90,
       input: 80,
@@ -63,7 +63,7 @@ export class AppElement {
 
   private getDefaultHeight(): number {
     const defaults: Record<ElementType, number> = {
-      collection: 80,
+      collection: 90,
       function: 60,
       object: 78,
       input: 40,
