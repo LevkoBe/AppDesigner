@@ -205,7 +205,7 @@ export const ELEMENT_STATES_CSS = `
   max-width: 100%;
   padding: 0 5px;
   box-sizing: border-box;
-  pointer-events: none;
+  user-select: none;
 }
 
 .element-input {

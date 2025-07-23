@@ -80,7 +80,7 @@ export class InputState {
         this.setAction(elementId ? "select" : "none");
         break;
     }
-    this.activeId = elementId ?? this.activeId;
+    this.activeId = elementId;
   }
 
   resetConnectionState() {
