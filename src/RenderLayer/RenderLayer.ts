@@ -54,15 +54,13 @@ export class RenderLayer {
         this.elementMap.set(element.id, domElement);
       }
 
-      const isSelected = element.id === selectedId;
-      const isEditing = this.state.editingElement?.id === element.id;
-      const isActive = this.state.fromElement?.id === element.id;
-
-      this.elementFactory.updateElement(domElement, element);
-
-      this.elementFactory.updateSelectedState(domElement, isSelected);
-      this.elementFactory.updateIsActiveState(domElement, isActive);
-      this.elementFactory.updateEditingState(domElement, element, isEditing);
+      this.elementFactory.updateElement(
+        domElement,
+        element,
+        element.id === selectedId,
+        this.state.fromElement?.id === element.id,
+        this.state.editingElement?.id === element.id
+      );
     });
 
     const pos = this.state.targetPosition;
@@ -219,12 +217,5 @@ export class RenderLayer {
 
     this.canvas.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
     this.canvas.style.transformOrigin = `0 0`;
-  }
-
-  updateElementDraggingState(elementId: string, isDragging: boolean) {
-    const domElement = this.elementMap.get(elementId);
-    if (domElement) {
-      this.elementFactory.updateDraggingState(domElement, isDragging);
-    }
   }
 }

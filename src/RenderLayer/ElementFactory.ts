@@ -1,5 +1,5 @@
 import { AppElement } from "../_models/AppElement.js";
-import { ElementType, elementTypeList } from "../types.js";
+import { ElementState, ElementType, elementTypeList } from "../types.js";
 
 export class ElementFactory {
   private elementTemplates: Map<ElementType, HTMLElement>;
@@ -41,7 +41,13 @@ export class ElementFactory {
     return domElement;
   }
 
-  updateElement(domElement: HTMLElement, element: AppElement) {
+  updateElement(
+    domElement: HTMLElement,
+    element: AppElement,
+    isSelected: boolean,
+    isActive: boolean,
+    isEditing: boolean
+  ) {
     domElement.style.left = element.x - element.width / 2 + "px";
     domElement.style.top = element.y - element.height / 2 + "px";
     domElement.style.width = element.width + "px";
@@ -56,33 +62,20 @@ export class ElementFactory {
     textSpan.textContent = element.text;
     input.value = element.text;
 
-    this.updateStateClass(domElement, "has-parent", !!element.parent);
-    this.updateStateClass(
-      domElement,
-      "has-children",
-      !!element.children.length
-    );
-    this.updateStateClass(domElement, "is-anchored", element.isAnchored);
+    this.updateStateClass(domElement, "child", !!element.parent);
+    this.updateStateClass(domElement, "parent", !!element.children.length);
+    this.updateStateClass(domElement, "anchored", element.isAnchored);
+    this.updateStateClass(domElement, "selected", isSelected);
+    this.updateStateClass(domElement, "active", isActive);
+    this.updateEditingState(domElement, element, isEditing);
   }
 
   updateStateClass(
     domElement: HTMLElement,
-    className: string,
+    className: ElementState,
     condition: boolean
   ) {
     domElement.classList.toggle(className, condition);
-  }
-
-  updateSelectedState(domElement: HTMLElement, isSelected: boolean) {
-    this.updateStateClass(domElement, "selected", isSelected);
-  }
-
-  updateIsActiveState(domElement: HTMLElement, isActive: boolean) {
-    this.updateStateClass(domElement, "is-active", isActive);
-  }
-
-  updateDraggingState(domElement: HTMLElement, isDragging: boolean) {
-    this.updateStateClass(domElement, "dragging", isDragging);
   }
 
   updateEditingState(

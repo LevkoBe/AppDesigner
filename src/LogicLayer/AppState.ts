@@ -14,7 +14,6 @@ export class AppState {
   elements: AppElement[] = [];
   connections: Connection[] = [];
   selectedElement: AppElement | undefined;
-  dragging: boolean = false;
   fromElement: AppElement | undefined;
   zoom: number = 1;
   pan: Point = { x: 0, y: 0 };
@@ -145,7 +144,6 @@ export class AppState {
     this.elements = [];
     this.connections = [];
     this.selectedElement = undefined;
-    this.dragging = false;
     this.fromElement = undefined;
     this.zoom = 1;
     this.pan = { x: 0, y: 0 };

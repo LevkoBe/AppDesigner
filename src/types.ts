@@ -6,6 +6,12 @@ export const elementTypeList = [
   "output",
 ] as const;
 export type ElementType = (typeof elementTypeList)[number];
+export type ElementState =
+  | "selected"
+  | "child"
+  | "parent"
+  | "anchored"
+  | "active";
 
 export type Mode = "create" | "connect" | "move" | "edit";
 export type Action =
@@ -52,3 +58,5 @@ export interface ConnectionData {
   from: string;
   to: string;
 }
+
+export type CSSColorVar = `var(--${string})`;

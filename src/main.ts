@@ -1,8 +1,5 @@
 import { App } from "./App.ts";
-import {
-  ELEMENT_STATES_CSS,
-  initializeStateObserver,
-} from "./RenderLayer/DynamicCSS.ts";
+import { initializeStateObserver } from "./RenderLayer/DynamicCSS.ts";
 
 declare global {
   interface Window {
@@ -20,10 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-document.head.insertAdjacentHTML(
-  "beforeend",
-  `<style>${ELEMENT_STATES_CSS}</style>`
-);
 initializeStateObserver();
 
 export { App } from "./App.ts";
