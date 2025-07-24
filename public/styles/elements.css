@@ -13,12 +13,16 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
+  border-radius: 50%;
   transition: transform 0.3s ease;
+  --depth: 0;
+  z-index: var(--depth);
   --element-gradient: radial-gradient(
     circle,
     rgba(156, 163, 175, 0.3) 0%,
     transparent 100%
   );
+  --stroke-width: 15px;
 }
 .element::before {
   content: "";
@@ -36,12 +40,14 @@
   transition: all 0.3s ease;
 }
 
+.element.collection {
+  border-radius: 0;
+}
+
 .element .element-svg {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+  width: 130%;
+  height: 130%;
   stroke: rgba(var(--color-gray-90), 0.8);
   stroke-width: 15px;
   box-sizing: border-box;
@@ -49,7 +55,7 @@
 .element .element-svg path {
   fill: none;
   stroke: var(--color-light-gray);
-  stroke-width: 15px;
+  stroke-width: var(--stroke-width);
   transition: stroke 0.3s ease;
 }
 

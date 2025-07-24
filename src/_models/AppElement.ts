@@ -5,6 +5,8 @@ export class AppElement {
   id: string;
   text: string;
   size: number;
+  strokeWidth: number = 15;
+  depth: number = 0;
   widthRatio: number;
   heightRatio: number;
   children: AppElement[];
@@ -12,7 +14,7 @@ export class AppElement {
   domElement?: HTMLElement;
   isAnchored: boolean;
 
-  private static readonly BASE_SIZE_UNIT = 90;
+  private static readonly BASE_SIZE_UNIT = 75;
 
   constructor(
     public type: ElementType,
@@ -32,7 +34,9 @@ export class AppElement {
     this.heightRatio = heightRatio;
     this.size = AppElement.BASE_SIZE_UNIT;
 
+    this.calculateSize();
     if (parent) {
+      this.depth = parent.depth + 1;
       parent.children.push(this);
       parent.calculateSize();
     }
@@ -49,14 +53,20 @@ export class AppElement {
   public calculateSize(): void {
     if (this.children.length === 0) {
       this.size = AppElement.BASE_SIZE_UNIT;
-      return;
+    } else {
+      const totalArea = this.children.reduce(
+        (a, b) => a + b.width * b.height,
+        0
+      );
+      const ratioProduct = this.widthRatio * this.heightRatio || 1;
+      const estimatedSize = Math.sqrt(totalArea / ratioProduct) * 1.3;
+
+      this.size = Math.max(estimatedSize, AppElement.BASE_SIZE_UNIT);
     }
 
-    const totalArea = this.children.reduce((a, b) => a + b.width * b.height, 0);
-    const ratioProduct = this.widthRatio * this.heightRatio || 1;
-    const estimatedSize = Math.sqrt(totalArea / ratioProduct) * 1.3;
-
-    this.size = Math.max(estimatedSize, AppElement.BASE_SIZE_UNIT);
+    const ratioFactor = this.widthRatio / this.heightRatio;
+    const sizeFactor = AppElement.BASE_SIZE_UNIT / this.size;
+    this.strokeWidth = 15 * Math.pow(sizeFactor, 0.4) * Math.sqrt(ratioFactor);
   }
 
   private getDefaultText(): string {

@@ -53,6 +53,8 @@ export class ElementFactory {
     domElement.style.top = element.y + pan.y - element.height / 2 + "px";
     domElement.style.width = element.width + "px";
     domElement.style.height = element.height + "px";
+    domElement.style.setProperty("--stroke-width", element.strokeWidth + "px");
+    domElement.style.setProperty("--depth", element.depth.toString());
 
     const textSpan = domElement.querySelector(".element-text") as HTMLElement;
     const input = domElement.querySelector(
