@@ -79,8 +79,13 @@ export class ForceDirectedLayout {
 
   private getCanvasCenter(): Point {
     if (!this.canvasElement) return { x: 0, y: 0 };
-    const rect = this.canvasElement.getBoundingClientRect();
-    return { x: rect.width / 2, y: rect.height / 2 };
+
+    const center = {
+      x: this.canvasElement.offsetWidth / 2,
+      y: this.canvasElement.offsetHeight / 2,
+    };
+
+    return center;
   }
 
   private updateTemperature() {
