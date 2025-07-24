@@ -98,8 +98,6 @@ export class AppState {
       );
       element.id = elementData.id;
       element.text = elementData.text;
-      element.width = elementData.width;
-      element.height = elementData.height;
 
       elementMap.set(element.id, element);
 
@@ -118,6 +116,7 @@ export class AppState {
         child.parent = parent;
         if (!parent.children.includes(child)) {
           parent.children.push(child);
+          parent.calculateSize();
         }
       }
     }

@@ -4,12 +4,15 @@ import { Connection } from "./Connection.ts";
 export class AppElement {
   id: string;
   text: string;
-  width: number;
-  height: number;
+  size: number;
+  widthRatio: number;
+  heightRatio: number;
   children: AppElement[];
   connections: Connection[];
   domElement?: HTMLElement;
   isAnchored: boolean;
+
+  private static readonly BASE_SIZE_UNIT = 90;
 
   constructor(
     public type: ElementType,
@@ -20,23 +23,40 @@ export class AppElement {
   ) {
     this.id = (Date.now() + Math.random()).toString();
     this.text = this.getDefaultText();
-    this.width = this.getDefaultWidth();
-    this.height = this.getDefaultHeight();
     this.children = [];
     this.connections = [];
     this.isAnchored = isAnchored;
 
+    const { widthRatio, heightRatio } = this.getDefaultRatios();
+    this.widthRatio = widthRatio;
+    this.heightRatio = heightRatio;
+    this.size = AppElement.BASE_SIZE_UNIT;
+
     if (parent) {
       parent.children.push(this);
+      parent.calculateSize();
     }
   }
 
-  get cornerX(): number {
-    return this.x - this.width / 2;
+  get width(): number {
+    return this.size * this.widthRatio;
   }
 
-  get cornerY(): number {
-    return this.y - this.height / 2;
+  get height(): number {
+    return this.size * this.heightRatio;
+  }
+
+  public calculateSize(): void {
+    if (this.children.length === 0) {
+      this.size = AppElement.BASE_SIZE_UNIT;
+      return;
+    }
+
+    const totalArea = this.children.reduce((a, b) => a + b.width * b.height, 0);
+    const ratioProduct = this.widthRatio * this.heightRatio || 1;
+    const estimatedSize = Math.sqrt(totalArea / ratioProduct) * 1.3;
+
+    this.size = Math.max(estimatedSize, AppElement.BASE_SIZE_UNIT);
   }
 
   private getDefaultText(): string {
@@ -50,26 +70,18 @@ export class AppElement {
     return defaults[this.type] || "AppElement";
   }
 
-  private getDefaultWidth(): number {
-    const defaults: Record<ElementType, number> = {
-      collection: 90,
-      function: 100,
-      object: 90,
-      input: 80,
-      output: 80,
+  private getDefaultRatios(): { widthRatio: number; heightRatio: number } {
+    const defaults: Record<
+      ElementType,
+      { widthRatio: number; heightRatio: number }
+    > = {
+      collection: { widthRatio: 1.0, heightRatio: 1.0 },
+      function: { widthRatio: 1.2, heightRatio: 0.8 },
+      object: { widthRatio: 1.0, heightRatio: 0.8 },
+      input: { widthRatio: 0.8, heightRatio: 0.5 },
+      output: { widthRatio: 0.8, heightRatio: 0.5 },
     };
-    return defaults[this.type] || 100;
-  }
-
-  private getDefaultHeight(): number {
-    const defaults: Record<ElementType, number> = {
-      collection: 90,
-      function: 60,
-      object: 78,
-      input: 40,
-      output: 40,
-    };
-    return defaults[this.type] || 60;
+    return defaults[this.type] || { widthRatio: 1.0, heightRatio: 1.0 };
   }
 
   serialize(): ElementData {
@@ -79,8 +91,6 @@ export class AppElement {
       x: this.x,
       y: this.y,
       text: this.text,
-      width: this.width,
-      height: this.height,
       parentId: this.parent ? this.parent.id : undefined,
       childIds: this.children.map((child) => child.id),
       connectionIds: this.connections.map((conn) => conn.id),

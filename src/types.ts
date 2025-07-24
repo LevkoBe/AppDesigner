@@ -45,8 +45,6 @@ export interface ElementData {
   x: number;
   y: number;
   text: string;
-  width: number;
-  height: number;
   parentId: string | undefined;
   childIds: string[];
   connectionIds: string[];
