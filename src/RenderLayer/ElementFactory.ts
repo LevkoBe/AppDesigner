@@ -1,5 +1,5 @@
 import { AppElement } from "../_models/AppElement.js";
-import { ElementState, ElementType, elementTypeList } from "../types.js";
+import { ElementState, ElementType, elementTypeList, Point } from "../types.js";
 
 export class ElementFactory {
   private elementTemplates: Map<ElementType, HTMLElement>;
@@ -44,12 +44,13 @@ export class ElementFactory {
   updateElement(
     domElement: HTMLElement,
     element: AppElement,
+    pan: Point,
     isSelected: boolean,
     isActive: boolean,
     isEditing: boolean
   ) {
-    domElement.style.left = element.x - element.width / 2 + "px";
-    domElement.style.top = element.y - element.height / 2 + "px";
+    domElement.style.left = element.x + pan.x - element.width / 2 + "px";
+    domElement.style.top = element.y + pan.y - element.height / 2 + "px";
     domElement.style.width = element.width + "px";
     domElement.style.height = element.height + "px";
 

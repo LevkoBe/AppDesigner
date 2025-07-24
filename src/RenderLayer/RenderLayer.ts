@@ -20,11 +20,7 @@ export class RenderLayer {
   render() {
     this.updateStatus();
     this.updateElementTypeSelection();
-    this.setCanvasTransform(
-      this.state.zoom,
-      this.state.pan.x,
-      this.state.pan.y
-    );
+    this.setCanvasTransform(this.state.zoom);
     this.renderElements(
       this.state.elements,
       this.state.selectedElement?.id ?? undefined
@@ -57,6 +53,7 @@ export class RenderLayer {
       this.elementFactory.updateElement(
         domElement,
         element,
+        this.state.pan,
         element.id === selectedId,
         this.state.fromElement?.id === element.id,
         this.state.editingElement?.id === element.id
@@ -209,13 +206,13 @@ export class RenderLayer {
     }
   }
 
-  setCanvasTransform(zoom: number, panX: number, panY: number) {
+  setCanvasTransform(zoom: number) {
     const inverseZoom = 1 / zoom;
 
     this.canvas.style.width = `${100 * inverseZoom}%`;
     this.canvas.style.height = `${100 * inverseZoom}%`;
 
-    this.canvas.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
+    this.canvas.style.transform = `scale(${zoom})`;
     this.canvas.style.transformOrigin = `0 0`;
   }
 }
