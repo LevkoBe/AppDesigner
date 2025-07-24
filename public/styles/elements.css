@@ -93,6 +93,6 @@
 .element.selected .element-svg path {
   stroke: var(--color-yellow);
 }
-.element.active .element-svg path {
+.element.secondary .element-svg path {
   stroke: var(--color-blue);
 }

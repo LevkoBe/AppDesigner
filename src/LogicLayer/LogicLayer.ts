@@ -54,6 +54,7 @@ export class LogicLayer {
 
       case "select":
         activeId = this.handleSelect();
+        this.tryRestartLayout();
         break;
 
       case "anchor":
@@ -188,7 +189,15 @@ export class LogicLayer {
 
   private restartLayout() {
     this.layout.stop();
-    this.layout.start(this.appState.elements, this.appState.connections);
+
+    const ignored = this.inputState.secondaryId
+      ? [this.inputState.secondaryId]
+      : [];
+    this.layout.start(
+      this.appState.getRootElements(),
+      this.appState.connections,
+      ignored
+    );
   }
 
   private tryRestartLayout() {

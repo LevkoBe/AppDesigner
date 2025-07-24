@@ -11,7 +11,7 @@ export type ElementState =
   | "child"
   | "parent"
   | "anchored"
-  | "active";
+  | "secondary";
 
 export type Mode = "create" | "connect" | "move" | "edit";
 export type Action =

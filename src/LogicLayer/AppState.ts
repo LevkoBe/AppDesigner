@@ -63,6 +63,10 @@ export class AppState {
     return this.elements.find((e) => e.id === id);
   }
 
+  getRootElements(predicate?: (e: AppElement) => boolean): AppElement[] {
+    return this.elements.filter((e) => !e.parent && (predicate?.(e) ?? true));
+  }
+
   selectElement(element: AppElement | undefined) {
     this.selectedElement = element;
   }

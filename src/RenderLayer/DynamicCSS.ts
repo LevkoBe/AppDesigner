@@ -5,7 +5,7 @@ const STATE_COLORS: Record<ElementState, CSSColorVar> = {
   child: "var(--color-orange)",
   parent: "var(--color-green)",
   anchored: "var(--color-purple)",
-  active: "var(--color-blue)",
+  secondary: "var(--color-blue)",
 };
 
 type StateKey = keyof typeof STATE_COLORS;

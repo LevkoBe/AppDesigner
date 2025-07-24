@@ -69,7 +69,7 @@ export class ElementFactory {
     this.updateStateClass(domElement, "parent", !!element.children.length);
     this.updateStateClass(domElement, "anchored", element.isAnchored);
     this.updateStateClass(domElement, "selected", isSelected);
-    this.updateStateClass(domElement, "active", isActive);
+    this.updateStateClass(domElement, "secondary", isActive);
     this.updateEditingState(domElement, element, isEditing);
   }
 

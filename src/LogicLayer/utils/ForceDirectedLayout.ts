@@ -20,28 +20,35 @@ export interface ForceDirectedConfig {
   connectionGridAlignForce: number; // The strength of the force that aligns connected elements to the grid, particularly when they are nearly horizontal or vertical.
   gridRepulsionFactor: number; // A multiplier applied to the repulsion force when elements are closely aligned with the grid, encouraging grid-based spacing.
   perfectAlignmentThreshold: number; // The distance threshold within which an element is considered "perfectly aligned" to a grid line, leading to snapping.
-
   // Simulated annealing parameters
   annealingRate: number; // How quickly the temperature decreases (0.99 = slow cooling, 0.9 = fast cooling)
   minTemperature: number; // Minimum temperature multiplier (final stabilization level)
   coolingDelay: number; // Time in milliseconds before cooling starts after user interaction
   reheatOnInteraction: boolean; // Whether to reheat when user interacts with elements
+  // Hierarchical parameters
+  childScaleFactor: number; // Scale factor for child element forces and distances
+  childCenterStrength: number; // Strength of attraction to parent center for child elements
 }
 
 const BASE_UNIT = 125;
+
+interface LayoutContext {
+  center: Point;
+  depth: number;
+  parentElement?: AppElement;
+}
 
 export class ForceDirectedLayout {
   private config: ForceDirectedConfig;
   private velocities = new Map<string, Point>();
   private forces = new Map<string, Point>();
-  private spatialHash = new Map<string, AppElement[]>();
   private connectionMap = new Map<string, AppElement[]>();
   private isRunning = false;
   private animationId?: number;
-  private canvasCenter = { x: 0, y: 0 };
   private temperature = 1.0;
   private lastInteractionTime = Date.now();
   private coolingStartTime = 0;
+  private ignoreElementIds: string[] = [];
 
   constructor(
     private canvasElement: HTMLElement,
@@ -69,6 +76,8 @@ export class ForceDirectedLayout {
       minTemperature: 0.05,
       coolingDelay: 2000,
       reheatOnInteraction: true,
+      childScaleFactor: 0.7,
+      childCenterStrength: 0.15,
       ...config,
     };
   }
@@ -79,55 +88,88 @@ export class ForceDirectedLayout {
 
   private getCanvasCenter(): Point {
     if (!this.canvasElement) return { x: 0, y: 0 };
-
     const center = {
       x: this.canvasElement.offsetWidth / 2,
       y: this.canvasElement.offsetHeight / 2,
     };
-
     return center;
   }
 
   private updateTemperature() {
     const now = Date.now();
     const timeSinceInteraction = now - this.lastInteractionTime;
-
     if (timeSinceInteraction < this.config.coolingDelay) {
       return;
     }
-
     if (this.coolingStartTime === 0) {
       this.coolingStartTime = now;
     }
-
     if (this.temperature > this.config.minTemperature) {
       this.temperature *= this.config.annealingRate;
       this.temperature = Math.max(this.temperature, this.config.minTemperature);
     }
   }
 
-  start(elements: AppElement[], connections: Connection[]) {
+  private getAllElements(elements: AppElement[]): AppElement[] {
+    const allElements: AppElement[] = [];
+
+    const collectElements = (elementsToProcess: AppElement[]) => {
+      elementsToProcess.forEach((element) => {
+        allElements.push(element);
+        if (element.children && element.children.length > 0) {
+          collectElements(element.children);
+        }
+      });
+    };
+
+    collectElements(elements);
+    return allElements;
+  }
+
+  private initializeElementState(elements: AppElement[]) {
+    const allElements = this.getAllElements(elements);
+
+    allElements.forEach((e) => {
+      if (!this.velocities.has(e.id)) {
+        this.velocities.set(e.id, { x: 0, y: 0 });
+      }
+      if (!this.forces.has(e.id)) {
+        this.forces.set(e.id, { x: 0, y: 0 });
+      }
+    });
+  }
+
+  private buildConnectionMap(connections: Connection[]) {
+    this.connectionMap.clear();
+
+    connections.forEach((c) => {
+      if (c.from.depth === c.to.depth) {
+        if (!this.connectionMap.has(c.from.id)) {
+          this.connectionMap.set(c.from.id, []);
+        }
+        if (!this.connectionMap.has(c.to.id)) {
+          this.connectionMap.set(c.to.id, []);
+        }
+        this.connectionMap.get(c.from.id)!.push(c.to);
+        this.connectionMap.get(c.to.id)!.push(c.from);
+      }
+    });
+  }
+
+  start(
+    elements: AppElement[],
+    connections: Connection[],
+    ignoreElementIds: string[]
+  ) {
+    this.ignoreElementIds = ignoreElementIds;
     if (this.isRunning) return;
     this.isRunning = true;
 
     this.velocities.clear();
     this.forces.clear();
-    elements.forEach((e) => {
-      this.velocities.set(e.id, { x: 0, y: 0 });
-      this.forces.set(e.id, { x: 0, y: 0 });
-    });
 
-    this.connectionMap.clear();
-    connections.forEach((c) => {
-      if (!this.connectionMap.has(c.from.id)) {
-        this.connectionMap.set(c.from.id, []);
-      }
-      if (!this.connectionMap.has(c.to.id)) {
-        this.connectionMap.set(c.to.id, []);
-      }
-      this.connectionMap.get(c.from.id)!.push(c.to);
-      this.connectionMap.get(c.to.id)!.push(c.from);
-    });
+    this.initializeElementState(elements);
+    this.buildConnectionMap(connections);
 
     this.temperature = 1.0;
     this.lastInteractionTime = Date.now();
@@ -145,12 +187,16 @@ export class ForceDirectedLayout {
     if (!elements.length) return 0;
 
     this.updateTemperature();
-
     let totalMovement = 0;
+
     for (let i = 0; i < this.config.iterations; i++) {
-      this.calculateForces(elements);
-      totalMovement = this.updatePositions(elements);
+      totalMovement += this.calculateForcesHierarchical(elements, {
+        center: this.getCanvasCenter(),
+        depth: 0,
+      });
+      totalMovement += this.updatePositionsHierarchical(elements);
     }
+
     return totalMovement;
   }
 
@@ -158,7 +204,6 @@ export class ForceDirectedLayout {
     if (!this.isRunning) return;
 
     const movement = this.step(elements);
-
     const adjustedStopThreshold =
       this.config.stopThreshold * (0.1 + this.temperature * 0.9);
 
@@ -175,17 +220,50 @@ export class ForceDirectedLayout {
     );
   };
 
-  private calculateForces(elements: AppElement[]) {
-    this.canvasCenter = this.getCanvasCenter();
+  private calculateForcesHierarchical(
+    elements: AppElement[],
+    context: LayoutContext
+  ): number {
+    let totalMovement = 0;
 
-    this.spatialHash.clear();
+    totalMovement += this.calculateForcesForLevel(elements, context);
+
+    elements.forEach((element) => {
+      if (element.children && element.children.length > 0) {
+        const childContext: LayoutContext = {
+          center: { x: element.x, y: element.y },
+          depth: context.depth + 1,
+          parentElement: element,
+        };
+        totalMovement += this.calculateForcesHierarchical(
+          element.children,
+          childContext
+        );
+      }
+    });
+
+    return totalMovement;
+  }
+
+  private calculateForcesForLevel(
+    elements: AppElement[],
+    context: LayoutContext
+  ): number {
+    const { center, depth } = context;
+    const scaleFactor = Math.pow(this.config.childScaleFactor, depth);
+
+    const levelSpatialHash = new Map<string, AppElement[]>();
+    const adjustedHashSize = this.config.spatialHashSize * scaleFactor;
+
     elements.forEach((e) => {
-      const key = `${Math.floor(
-        e.x / this.config.spatialHashSize
-      )},${Math.floor(e.y / this.config.spatialHashSize)}`;
-      (
-        this.spatialHash.get(key) || this.spatialHash.set(key, []).get(key)!
-      ).push(e);
+      const key = `${Math.floor(e.x / adjustedHashSize)},${Math.floor(
+        e.y / adjustedHashSize
+      )}`;
+      const bucket = levelSpatialHash.get(key) || [];
+      if (!levelSpatialHash.has(key)) {
+        levelSpatialHash.set(key, bucket);
+      }
+      bucket.push(e);
     });
 
     elements.forEach((e) => {
@@ -197,48 +275,56 @@ export class ForceDirectedLayout {
       if (e1.isAnchored) return;
 
       const f1 = this.forces.get(e1.id)!;
-      const cellX = Math.floor(e1.x / this.config.spatialHashSize);
-      const cellY = Math.floor(e1.y / this.config.spatialHashSize);
+      const cellX = Math.floor(e1.x / adjustedHashSize);
+      const cellY = Math.floor(e1.y / adjustedHashSize);
 
-      // Repulsion forces
       for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
-          const nearby = this.spatialHash.get(`${cellX + dx},${cellY + dy}`);
+          const nearby = levelSpatialHash.get(`${cellX + dx},${cellY + dy}`);
           if (!nearby) continue;
 
           nearby.forEach((e2) => {
-            if (e1.id === e2.id) return;
+            if (e1.id === e2.id || this.ignoreElementIds.includes(e2.id))
+              return;
+
             const deltaX = e1.x - e2.x;
             const deltaY = e1.y - e2.y;
             const distSq = deltaX * deltaX + deltaY * deltaY;
+            const maxRepulsionDist =
+              this.config.maxRepulsionDistance * scaleFactor;
 
-            if (distSq > this.config.maxRepulsionDistance ** 2) return;
+            if (distSq > maxRepulsionDist ** 2) return;
+
             if (distSq === 0) {
-              f1.x += (Math.random() - 0.5) * this.temperature;
-              f1.y += (Math.random() - 0.5) * this.temperature;
+              f1.x += (Math.random() - 0.5) * this.temperature * scaleFactor;
+              f1.y += (Math.random() - 0.5) * this.temperature * scaleFactor;
               return;
             }
 
             const dist = Math.sqrt(distSq);
+            const adjustedMinDistance = this.config.minDistance * scaleFactor;
             let force =
-              (this.config.repulsionForce / distSq) * this.temperature;
+              ((this.config.repulsionForce * scaleFactor) / distSq) *
+              this.temperature;
 
-            if (dist < this.config.minDistance) {
+            if (dist < adjustedMinDistance) {
               force +=
-                (this.config.minDistance - dist) *
+                (adjustedMinDistance - dist) *
                 this.config.repulsionForce *
+                scaleFactor *
                 0.01 *
                 this.temperature;
             }
 
+            const adjustedGridSize = this.config.gridSize * scaleFactor;
             const isAlignedX =
-              Math.abs(deltaX % this.config.gridSize) < 5 ||
-              Math.abs(deltaX % this.config.gridSize) >
-                this.config.gridSize - 5;
+              Math.abs(deltaX % adjustedGridSize) < 5 * scaleFactor ||
+              Math.abs(deltaX % adjustedGridSize) >
+                adjustedGridSize - 5 * scaleFactor;
             const isAlignedY =
-              Math.abs(deltaY % this.config.gridSize) < 5 ||
-              Math.abs(deltaY % this.config.gridSize) >
-                this.config.gridSize - 5;
+              Math.abs(deltaY % adjustedGridSize) < 5 * scaleFactor ||
+              Math.abs(deltaY % adjustedGridSize) >
+                adjustedGridSize - 5 * scaleFactor;
 
             if (isAlignedX || isAlignedY) {
               force *= this.config.gridRepulsionFactor;
@@ -250,98 +336,123 @@ export class ForceDirectedLayout {
         }
       }
 
-      // Spring forces (connections)
       this.connectionMap.get(e1.id)?.forEach((e2) => {
+        if (e1.depth !== e2.depth) return;
+
         const dx = e2.x - e1.x;
         const dy = e2.y - e1.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist === 0) return;
 
+        const adjustedSpringLength = this.config.springLength * scaleFactor;
         const springForce =
-          (dist - this.config.springLength) *
+          (dist - adjustedSpringLength) *
           this.config.attractionForce *
+          scaleFactor *
           this.temperature;
+
         f1.x += (dx / dist) * springForce;
         f1.y += (dy / dist) * springForce;
 
-        // Connection grid alignment (less aggressive when cold)
         const angle = Math.atan2(dy, dx);
         const angleThreshold = (10 * Math.PI) / 180;
         const alignForce =
-          this.config.connectionGridAlignForce * this.temperature;
+          this.config.connectionGridAlignForce * scaleFactor * this.temperature;
+        const adjustedGridSize = this.config.gridSize * scaleFactor;
 
         if (
           Math.abs(angle) < angleThreshold ||
           Math.abs(angle - Math.PI) < angleThreshold
         ) {
           const targetY =
-            Math.round(e1.y / this.config.gridSize) * this.config.gridSize;
+            Math.round(e1.y / adjustedGridSize) * adjustedGridSize;
           f1.y += (targetY - e1.y) * alignForce;
           const targetY2 =
-            Math.round(e2.y / this.config.gridSize) * this.config.gridSize;
+            Math.round(e2.y / adjustedGridSize) * adjustedGridSize;
           this.forces.get(e2.id)!.y += (targetY2 - e2.y) * alignForce;
         } else if (
           Math.abs(angle - Math.PI / 2) < angleThreshold ||
           Math.abs(angle + Math.PI / 2) < angleThreshold
         ) {
           const targetX =
-            Math.round(e1.x / this.config.gridSize) * this.config.gridSize;
+            Math.round(e1.x / adjustedGridSize) * adjustedGridSize;
           f1.x += (targetX - e1.x) * alignForce;
           const targetX2 =
-            Math.round(e2.x / this.config.gridSize) * this.config.gridSize;
+            Math.round(e2.x / adjustedGridSize) * adjustedGridSize;
           this.forces.get(e2.id)!.x += (targetX2 - e2.x) * alignForce;
         }
       });
 
-      // Grid attraction (stronger when cold for final alignment)
-      const targetX =
-        Math.round(e1.x / this.config.gridSize) * this.config.gridSize;
-      const targetY =
-        Math.round(e1.y / this.config.gridSize) * this.config.gridSize;
+      const adjustedGridSize = this.config.gridSize * scaleFactor;
+      const targetX = Math.round(e1.x / adjustedGridSize) * adjustedGridSize;
+      const targetY = Math.round(e1.y / adjustedGridSize) * adjustedGridSize;
       const gridForceMultiplier = Math.max(0.3, this.temperature);
-      f1.x += (targetX - e1.x) * this.config.gridForce * gridForceMultiplier;
-      f1.y += (targetY - e1.y) * this.config.gridForce * gridForceMultiplier;
 
-      // Center attraction
       f1.x +=
-        (this.canvasCenter.x - e1.x) *
-        this.config.centerAttractionForce *
-        this.temperature;
+        (targetX - e1.x) *
+        this.config.gridForce *
+        scaleFactor *
+        gridForceMultiplier;
       f1.y +=
-        (this.canvasCenter.y - e1.y) *
-        this.config.centerAttractionForce *
-        this.temperature;
+        (targetY - e1.y) *
+        this.config.gridForce *
+        scaleFactor *
+        gridForceMultiplier;
 
-      // Apply temperature-adjusted max force
+      const centerForce =
+        depth === 0
+          ? this.config.centerAttractionForce
+          : this.config.childCenterStrength;
+      f1.x += (center.x - e1.x) * centerForce * scaleFactor * this.temperature;
+      f1.y += (center.y - e1.y) * centerForce * scaleFactor * this.temperature;
+
       const adjustedMaxForce =
-        this.config.maxForce * Math.max(0.1, this.temperature);
+        this.config.maxForce * scaleFactor * Math.max(0.1, this.temperature);
       const forceMag = Math.sqrt(f1.x * f1.x + f1.y * f1.y);
       if (forceMag > adjustedMaxForce) {
         f1.x = (f1.x / forceMag) * adjustedMaxForce;
         f1.y = (f1.y / forceMag) * adjustedMaxForce;
       }
 
-      // Apply temperature-adjusted damping (more damping when cold)
       const adjustedDamping =
         this.config.damping * (0.3 + this.temperature * 0.7);
       const v = this.velocities.get(e1.id)!;
       v.x = (v.x + f1.x) * adjustedDamping;
       v.y = (v.y + f1.y) * adjustedDamping;
     });
+
+    return 0;
   }
 
-  private updatePositions(elements: AppElement[]): number {
+  private updatePositionsHierarchical(elements: AppElement[]): number {
     let totalMovement = 0;
 
+    totalMovement += this.updatePositionsForLevel(elements, 0);
+
+    elements.forEach((element) => {
+      if (element.children && element.children.length > 0) {
+        totalMovement += this.updatePositionsHierarchical(element.children);
+      }
+    });
+
+    return totalMovement;
+  }
+
+  private updatePositionsForLevel(
+    elements: AppElement[],
+    depth: number
+  ): number {
+    let totalMovement = 0;
+    const scaleFactor = Math.pow(this.config.childScaleFactor, depth);
+
     elements.forEach((e) => {
-      if (e.isAnchored) return;
+      if (e.isAnchored || this.ignoreElementIds.includes(e.id)) return;
 
       const v = this.velocities.get(e.id)!;
       const mag = Math.sqrt(v.x * v.x + v.y * v.y);
 
-      // Temperature-adjusted movement threshold
       const adjustedThreshold =
-        this.config.movementThreshold * this.temperature;
+        this.config.movementThreshold * scaleFactor * this.temperature;
 
       if (mag > adjustedThreshold) {
         e.x += v.x;
@@ -349,27 +460,27 @@ export class ForceDirectedLayout {
         totalMovement += mag;
       }
 
-      // Grid snapping (more aggressive when cold)
-      const remainderX = e.x % this.config.gridSize;
-      const remainderY = e.y % this.config.gridSize;
+      const adjustedGridSize = this.config.gridSize * scaleFactor;
+      const remainderX = e.x % adjustedGridSize;
+      const remainderY = e.y % adjustedGridSize;
 
-      // Increase snapping threshold when temperature is low
       const snapThreshold =
-        this.config.perfectAlignmentThreshold * (2 - this.temperature);
+        this.config.perfectAlignmentThreshold *
+        scaleFactor *
+        (2 - this.temperature);
 
       const nearGridX =
         Math.abs(remainderX) < snapThreshold ||
-        Math.abs(remainderX - this.config.gridSize) < snapThreshold ||
-        Math.abs(remainderX + this.config.gridSize) < snapThreshold;
+        Math.abs(remainderX - adjustedGridSize) < snapThreshold ||
+        Math.abs(remainderX + adjustedGridSize) < snapThreshold;
 
       const nearGridY =
         Math.abs(remainderY) < snapThreshold ||
-        Math.abs(remainderY - this.config.gridSize) < snapThreshold ||
-        Math.abs(remainderY + this.config.gridSize) < snapThreshold;
+        Math.abs(remainderY - adjustedGridSize) < snapThreshold ||
+        Math.abs(remainderY + adjustedGridSize) < snapThreshold;
 
       if (nearGridX) {
-        const snappedX =
-          Math.round(e.x / this.config.gridSize) * this.config.gridSize;
+        const snappedX = Math.round(e.x / adjustedGridSize) * adjustedGridSize;
         if (Math.abs(snappedX - e.x) > 0.01) {
           totalMovement += Math.abs(snappedX - e.x);
           e.x = snappedX;
@@ -377,8 +488,7 @@ export class ForceDirectedLayout {
       }
 
       if (nearGridY) {
-        const snappedY =
-          Math.round(e.y / this.config.gridSize) * this.config.gridSize;
+        const snappedY = Math.round(e.y / adjustedGridSize) * adjustedGridSize;
         if (Math.abs(snappedY - e.y) > 0.01) {
           totalMovement += Math.abs(snappedY - e.y);
           e.y = snappedY;
@@ -395,5 +505,13 @@ export class ForceDirectedLayout {
 
   getConfig(): ForceDirectedConfig {
     return { ...this.config };
+  }
+
+  reheatSimulation() {
+    if (this.config.reheatOnInteraction) {
+      this.temperature = 1.0;
+      this.lastInteractionTime = Date.now();
+      this.coolingStartTime = 0;
+    }
   }
 }
