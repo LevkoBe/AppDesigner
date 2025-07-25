@@ -4,10 +4,13 @@ import { Connection } from "../_models/Connection.js";
 import { AppElement } from "../_models/AppElement.js";
 import { AppState } from "./AppState.js";
 import { ProjectManager } from "./utils/ProjectManager.js";
+import { RuleEngine, RuleFeedback } from "./utils/RuleEngine.js";
 
 export class LogicLayer {
   private projectManager: ProjectManager;
   private layout: ForceDirectedLayout;
+  private ruleEngine: RuleEngine;
+  private ruleFeedback: RuleFeedback;
 
   constructor(
     private inputState: InputState,
@@ -16,6 +19,8 @@ export class LogicLayer {
   ) {
     this.projectManager = new ProjectManager(appState);
     this.layout = new ForceDirectedLayout(canvasElement);
+    this.ruleEngine = new RuleEngine();
+    this.ruleFeedback = new RuleFeedback();
   }
 
   processInput() {
@@ -123,6 +128,18 @@ export class LogicLayer {
       ? this.appState.getElementById(parentId) ?? undefined
       : undefined;
     const element = new AppElement(this.inputState.elementType, x, y, parent);
+
+    const ruleResults = this.ruleEngine.evaluateElementCreation(
+      element,
+      this.appState
+    );
+    const blockingResult = this.ruleEngine.getBlockingResult(ruleResults);
+
+    if (blockingResult) {
+      this.ruleFeedback.show(blockingResult);
+      return undefined;
+    }
+
     this.appState.addElement(element);
     this.inputState.activeId = element.id;
     return element.id;
@@ -150,10 +167,31 @@ export class LogicLayer {
         (conn.from.id === toElement.id && conn.to.id === fromElement.id)
     );
 
-    if (!connectionExists) {
-      const connection = new Connection(fromElement, toElement);
-      this.appState.addConnection(connection);
+    if (connectionExists) {
+      this.ruleFeedback.show({
+        allowed: false,
+        message: `Connection already exists between ${
+          fromElement.text || fromElement.type
+        } and ${toElement.text || toElement.type}`,
+        ruleName: "Duplicate Connection",
+      });
+      return;
     }
+
+    const ruleResults = this.ruleEngine.evaluateConnection(
+      fromElement,
+      toElement,
+      this.appState
+    );
+    const blockingResult = this.ruleEngine.getBlockingResult(ruleResults);
+
+    if (blockingResult) {
+      this.ruleFeedback.show(blockingResult);
+      return;
+    }
+
+    const connection = new Connection(fromElement, toElement);
+    this.appState.addConnection(connection);
   }
 
   private handleSelect(): string | undefined {
