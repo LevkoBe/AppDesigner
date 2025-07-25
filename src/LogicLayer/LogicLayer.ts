@@ -4,7 +4,8 @@ import { Connection } from "../_models/Connection.js";
 import { AppElement } from "../_models/AppElement.js";
 import { AppState } from "./AppState.js";
 import { ProjectManager } from "./utils/ProjectManager.js";
-import { RuleEngine, RuleFeedback } from "./utils/RuleEngine.js";
+import { RuleFeedback } from "../RenderLayer/RuleFeedback.js";
+import { RuleEngine } from "./utils/RuleEngine.js";
 
 export class LogicLayer {
   private projectManager: ProjectManager;
@@ -58,6 +59,7 @@ export class LogicLayer {
         break;
 
       case "select":
+        this.ruleFeedback.hide();
         activeId = this.handleSelect();
         this.tryRestartLayout();
         break;

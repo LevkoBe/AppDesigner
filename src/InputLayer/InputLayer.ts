@@ -19,12 +19,21 @@ export class InputLayer {
     this.canvas.addEventListener("mouseup", this.handleMouseUp);
     this.canvas.addEventListener("dblclick", this.handleDoubleClick);
     this.setupModeButtons();
+    this.setupPopupButtons();
     this.setupElementTypeButtons();
     this.setupContextMenuEvents();
     this.setupProjectEvents();
     this.setupControlsEvents();
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("input", this.handleInput);
+  }
+
+  private setupPopupButtons() {
+    const closeBtn = document.querySelector("#popup .closeBtn");
+    if (!closeBtn) throw new Error("Popup button absent");
+    closeBtn?.addEventListener("click", () =>
+      this.inputState.interpretActionOnElement("select", undefined)
+    );
   }
 
   private setupControlsEvents() {
@@ -216,25 +225,27 @@ export class InputLayer {
   };
 
   private handleKeyDown = (e: KeyboardEvent) => {
+    if (e.code === "Escape") {
+      this.inputState.interpretActionOnElement("select", undefined);
+      return;
+    }
+
     const activeId = this.inputState.activeId;
     if (activeId) {
       switch (e.code) {
         case "F2":
           this.inputState.interpretTextEdit(activeId);
-          return;
-        case "Escape":
-          this.inputState.interpretActionOnElement("select", undefined);
           break;
         case "KeyA":
           this.inputState.interpretActionOnElement("anchor", activeId);
           break;
       }
-    }
 
-    if (this.inputState.isEditing && activeId) {
-      if (e.key === "Escape" || e.key === "Enter") {
-        this.inputState.setAction("select");
-        e.preventDefault();
+      if (this.inputState.isEditing) {
+        if (e.key === "Enter") {
+          this.inputState.setAction("select");
+          e.preventDefault();
+        }
       }
     }
   };
