@@ -58,10 +58,10 @@ export class InputState {
           return;
         }
         const secondary =
-          this.secondaryId !== elementId
-            ? this.secondaryId
-            : this.activeId !== elementId
+          this.activeId !== elementId
             ? this.activeId
+            : this.secondaryId !== elementId
+            ? this.secondaryId
             : undefined;
         if (!secondary) {
           this.setAction("select");
