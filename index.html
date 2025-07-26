@@ -9,62 +9,264 @@
     <link rel="stylesheet" href="./styles/elements.css" />
     <link rel="stylesheet" href="./styles/connections.css" />
     <link rel="stylesheet" href="./styles/popup.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Belanosima&display=swap"
+    />
   </head>
   <body>
-    <div class="container">
-      <div class="bar" id="toolbar">
-        <h2>Application Designer</h2>
-
-        <div id="modeSelection" class="section">
-          <h3>Interaction Mode</h3>
-          <div class="mode-buttons">
-            <div class="mode-btn active" data-mode="create">Create / Child</div>
-            <div class="mode-btn" data-mode="connect">Connection</div>
-            <div class="mode-btn" data-mode="move">Movement</div>
-            <div class="mode-btn" data-mode="edit">Edit</div>
+    <div class="hidden context-menu" id="contextMenu">
+      <div class="context-menu-item" id="editBtn">Edit</div>
+      <div class="context-menu-item" id="duplicateBtn">Duplicate</div>
+      <div class="context-menu-separator"></div>
+      <div class="context-menu-item" id="deleteBtn">Delete</div>
+    </div>
+    <div id="topBar">
+      <div id="createButtons" class="first topbarButtons">
+        <h2>Create</h2>
+        <div class="buttonSet">
+          <div class="topbarBtn" data-create="collection">
+            <svg
+              width="32"
+              height="30"
+              viewBox="0 0 32 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M23.3359 1.83081H29.9205V28.1692H23.3359M8.66419 28.1692H2.07959V1.83081H8.66419"
+                stroke="#81E0FF"
+                stroke-width="2.50842"
+              />
+            </svg>
           </div>
-        </div>
-
-        <div id="elementTypeSelection" class="section">
-          <h3>Element Types</h3>
-          <div class="element-buttons">
-            <div class="element-btn" data-type="collection">
-              [Collections] - Rectangles
-            </div>
-            <div class="element-btn" data-type="function">
-              (Functions) - Ovals
-            </div>
-            <div class="element-btn active" data-type="object">
-              {Objects} - Polygons
-            </div>
-            <div class="element-btn" data-type="input">&gt;Inputs&lt;</div>
-            <div class="element-btn" data-type="output">&gt;Outputs&lt;</div>
+          <div class="topbarBtn" data-create="function">
+            <svg
+              width="38"
+              height="28"
+              viewBox="0 0 38 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M31.9641 0.830811C37.9315 8.59626 37.9315 19.4037 31.9641 27.1692M6.03562 27.1692C0.0682064 19.4037 0.0682064 8.59626 6.03562 0.830811"
+                stroke="#81E0FF"
+                stroke-width="2.50833"
+              />
+            </svg>
           </div>
-        </div>
-
-        <div class="section">
-          <h3>Actions</h3>
-          <div class="mode-buttons">
-            <div class="mode-btn" id="saveBtn">Save Project</div>
-            <div class="mode-btn" id="loadBtn">Load Project</div>
-            <div class="mode-btn" id="clearBtn">Clear Canvas</div>
+          <div class="topbarBtn" data-create="object">
+            <svg
+              width="36"
+              height="30"
+              viewBox="0 0 36 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22.8611 1.83081H25.7336C27.7837 1.83081 29.4457 3.49278 29.4457 5.54293V8.41541C29.4457 8.41541 29.4457 15 35.4116 15C29.4457 15 29.4457 21.5846 29.4457 21.5846V24.4571C29.4457 26.5072 27.7837 28.1692 25.7336 28.1692H22.8611M13.1389 28.1692H10.2664C8.21626 28.1692 6.55429 26.5072 6.55429 24.4571V21.5846C6.55429 21.5846 6.55429 15 0.588379 15C6.55429 15 6.55429 8.41541 6.55429 8.41541V5.54293C6.55429 3.49278 8.21626 1.83081 10.2664 1.83081H13.1389"
+                stroke="#ADFF49"
+                stroke-width="2.50842"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-create="input">
+            <svg
+              width="39"
+              height="30"
+              viewBox="0 0 39 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1.5 1.83081L14.7576 15L1.5 28.1692M23.2424 1.83081L36.5 15L23.2424 28.1692"
+                stroke="#81E0FF"
+                stroke-width="2.50842"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-create="output">
+            <svg
+              width="39"
+              height="30"
+              viewBox="0 0 39 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M37.5 28.1692L24.2424 15L37.5 1.83081M15.7576 28.1692L2.5 15L15.7576 1.83081"
+                stroke="#81E0FF"
+                stroke-width="2.50842"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-create="connection">
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 30 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.75 0C5.82107 0 7.5 1.67893 7.5 3.75C7.5 4.08483 7.45049 4.40791 7.36816 4.7168L25.2795 22.6282C25.5892 22.5454 25.9143 22.5 26.25 22.5C28.3211 22.5 30 24.1789 30 26.25C30 28.3211 28.3211 30 26.25 30C24.1789 30 22.5 28.3211 22.5 26.25C22.5 25.9143 22.5454 25.5892 22.6282 25.2795L4.7168 7.36816C4.40791 7.45049 4.08483 7.5 3.75 7.5C1.67893 7.5 0 5.82107 0 3.75C0 1.67893 1.67893 0 3.75 0Z"
+                fill="#81E0FF"
+              />
+            </svg>
           </div>
         </div>
       </div>
-
-      <div class="canvas-container">
-        <div class="controls">
-          <div class="control-btn active" id="layoutBtn">Auto Layout</div>
-          <div class="control-btn" id="zoomInBtn">Zoom In</div>
-          <div class="control-btn" id="zoomOutBtn">Zoom Out</div>
-          <div class="control-btn" id="resetViewBtn">Reset View</div>
+      <div id="projectButtons" class="topbarButtons">
+        <h2>Project</h2>
+        <div class="buttonSet">
+          <div class="topbarBtn" data-project="import">
+            <svg
+              width="28"
+              height="27"
+              viewBox="0 0 28 27"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M26.5 18.7044V24.2258C26.5 24.9295 25.9004 25.5 25.1607 25.5H2.83929C2.09962 25.5 1.5 24.9295 1.5 24.2258V18.7044M13.8884 0.5V17.3717M13.8884 17.3717L8.53125 10.5762M13.8884 17.3717L19.2455 10.5762"
+                stroke="#81E0FF"
+                stroke-width="2.67857"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-project="export">
+            <svg
+              width="28"
+              height="27"
+              viewBox="0 0 28 27"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M26.5 18.4544V23.9758C26.5 24.6795 25.9004 25.25 25.1607 25.25H2.83929C2.09962 25.25 1.5 24.6795 1.5 23.9758V18.4544M14 19.6217V2.75M14 2.75L19.3571 9.54556M14 2.75L8.64286 9.54556"
+                stroke="#81E0FF"
+                stroke-width="2.67857"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn danger" data-project="clear">
+            <svg
+              width="24"
+              height="32"
+              viewBox="0 0 24 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.187 4.62637H2.95466C2.94217 4.62637 2.93075 4.63343 2.92517 4.6446L1.14495 8.20504C1.13399 8.22696 1.14993 8.25275 1.17444 8.25275H22.826C22.8505 8.25275 22.8664 8.22696 22.8555 8.20504L21.0753 4.6446C21.0697 4.63343 21.0583 4.62637 21.0458 4.62637H13.8134M10.187 4.62637V1.03297C10.187 1.01476 10.2018 1 10.22 1H13.7804C13.7986 1 13.8134 1.01476 13.8134 1.03297V4.62637M10.187 4.62637H13.8134M18.9243 31H5.07614C5.05957 31 5.04557 30.9877 5.04344 30.9713L2.4446 10.9273C2.44204 10.9076 2.4574 10.8901 2.47729 10.8901H21.5231C21.543 10.8901 21.5584 10.9076 21.5558 10.9273L18.957 30.9713C18.9549 30.9877 18.9409 31 18.9243 31Z"
+                stroke="#A70000"
+                stroke-width="1.97802"
+              />
+            </svg>
+          </div>
         </div>
-
-        <div class="canvas" id="canvas"></div>
-        <div class="status" id="status">Ready - Create/Child Mode</div>
       </div>
+      <div id="appearanceButtons" class="last topbarButtons">
+        <h2>Appearance</h2>
+        <div class="buttonSet">
+          <div class="topbarBtn" data-appearance="autoLayout">
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 34 34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.6277 2H4.05319C2.6431 2 1.5 3.1431 1.5 4.55319V29.4468C1.5 30.8569 2.6431 32 4.05319 32H13.6277C15.0377 32 16.1809 30.8569 16.1809 29.4468V4.55319C16.1809 3.1431 15.0377 2 13.6277 2Z"
+                stroke="#81E0FF"
+                stroke-width="3"
+              />
+              <path
+                d="M29.9468 3.2766H24.8404C23.4303 3.2766 22.2872 4.4197 22.2872 5.82979V14.1277C22.2872 15.5377 23.4303 16.6809 24.8404 16.6809H29.9468C31.3569 16.6809 32.5 15.5377 32.5 14.1277V5.82979C32.5 4.4197 31.3569 3.2766 29.9468 3.2766Z"
+                stroke="#81E0FF"
+                stroke-width="3"
+              />
+              <path
+                d="M29.3085 22.7872H25.4787C24.0686 22.7872 22.9255 23.9303 22.9255 25.3404V29.1702C22.9255 30.5803 24.0686 31.7234 25.4787 31.7234H29.3085C30.7186 31.7234 31.8617 30.5803 31.8617 29.1702V25.3404C31.8617 23.9303 30.7186 22.7872 29.3085 22.7872Z"
+                stroke="#81E0FF"
+                stroke-width="3"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-appearance="zoomIn">
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 34 34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12.0323 7V17M17 11.9677H7"
+                stroke="#81E0FF"
+                stroke-width="1.83097"
+              />
+              <path
+                d="M32 32L19.0711 19.0711M19.0711 19.0711C20.8807 17.2614 22 14.7614 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C14.7614 22 17.2614 20.8807 19.0711 19.0711Z"
+                stroke="#81E0FF"
+                stroke-width="3.33333"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-appearance="zoomOut">
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 34 34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M17 11.9677H7" stroke="#81E0FF" stroke-width="1.83097" />
+              <path
+                d="M32 32L19.0711 19.0711M19.0711 19.0711C20.8807 17.2614 22 14.7614 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C14.7614 22 17.2614 20.8807 19.0711 19.0711Z"
+                stroke="#81E0FF"
+                stroke-width="3.33333"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn danger" data-appearance="zoomReset">
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 36 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12.9326 0.5C16.9745 0.500101 20.5645 2.43028 22.835 5.41797L23.334 4.64551L28.2598 7.8252L25.3486 12.334C25.358 12.5324 25.3643 12.7319 25.3643 12.9326C25.3642 14.8952 24.9063 16.7514 24.0957 18.4023L31.7529 23.3457L29.4395 26.9277L35.5 32.9893L34.2451 34.2451L32.9893 35.5L20.6406 23.1523L20.3076 22.9375C19.4493 23.5711 18.5066 24.0967 17.499 24.4951L12.8916 31.6338L7.96582 28.4541L10.1602 25.0527C4.62884 23.7928 0.500239 18.8454 0.5 12.9326C0.5 6.06655 6.06655 0.5 12.9326 0.5ZM17.4121 14.583L8.04004 8.5332L5.30664 12.7676L14.6787 18.8174L8.5332 28.3389L12.7676 31.0723L18.9141 21.5508L28.4355 27.6963L31.1689 23.4619L21.6465 17.3154L27.6963 7.94336L23.4619 5.20996L17.4121 14.583ZM12.9326 4.05273C8.02828 4.05273 4.05273 8.02828 4.05273 12.9326C4.053 17.6139 7.67568 21.4463 12.2705 21.7852L14.1094 18.9365L13.0625 18.2607H11.9912V17.5693L4.72559 12.8799L7.90625 7.95312L11.9912 10.5898V7.60449H13.9424V11.8486L14.0557 11.9229H18.2607V12.5039L20.7295 8.67969C19.2225 5.9228 16.296 4.05285 12.9326 4.05273ZM17.2891 14.0098L17.377 13.874H17.0791L17.2891 14.0098Z"
+                fill="#A70000"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-appearance="rightBar">
+            <svg
+              width="38"
+              height="38"
+              viewBox="0 0 38 38"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M32.5 36.5H5.5C3.29086 36.5 1.5 34.7091 1.5 32.5V5.5C1.5 3.29086 3.29086 1.5 5.5 1.5H32.5M32.5 36.5C34.7091 36.5 36.5 34.7091 36.5 32.5V5.5C36.5 3.29086 34.7091 1.5 32.5 1.5M32.5 36.5H26.5C24.2909 36.5 22.5 34.7091 22.5 32.5V5.5C22.5 3.29086 24.2909 1.5 26.5 1.5H32.5"
+                stroke="#81E0FF"
+                stroke-width="3"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="canvasContainer">
+      <div class="canvas" id="canvas"></div>
+      <div class="status" id="status">Ready - Create/Child Mode</div>
 
-      <div class="hidden bar" id="editbar">
+      <div id="rightBar" class="hidden bar">
         <h2>Element Properties</h2>
         <div id="readonlyProps">
           <div id="readonlyPropTemplate" class="readonlyProp">
@@ -100,13 +302,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="context-menu" id="contextMenu">
-      <div class="context-menu-item" id="editBtn">Edit</div>
-      <div class="context-menu-item" id="duplicateBtn">Duplicate</div>
-      <div class="context-menu-separator"></div>
-      <div class="context-menu-item" id="deleteBtn">Delete</div>
     </div>
 
     <div id="elementTemplates" style="display: none">
