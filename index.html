@@ -116,6 +116,67 @@
           </div>
         </div>
       </div>
+      <div id="modeButtons" class="topbarButtons">
+        <h2>Mode</h2>
+        <div class="buttonSet">
+          <div class="topbarBtn" data-mode="create">
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 26 26"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.4141 0.5V25.5M25.8335 12.9194H0.833496"
+                stroke="#ADFF49"
+                stroke-width="4.57742"
+              />
+            </svg>
+          </div>
+          <div class="hidden danger topbarBtn" data-mode="remove">
+            <svg
+              width="26"
+              height="6"
+              viewBox="0 0 26 6"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M25.5 3H0.5" stroke="#A70000" stroke-width="4.57742" />
+            </svg>
+          </div>
+          <div class="topbarBtn" data-mode="move">
+            <svg
+              width="35"
+              height="34"
+              viewBox="0 0 35 34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M17.3336 17V2.00038M17.3336 17H32.3332M17.3336 17V31.9996M17.3336 17H2.33398M17.3336 2.00038L21.9489 7.57716M17.3336 2.00038L12.7183 7.57716M32.3332 17L26.7564 21.6153M32.3332 17L26.7564 12.3847M17.3336 31.9996L12.7183 26.4228M17.3336 31.9996L21.9489 26.4228M2.33398 17L7.91077 12.3847M2.33398 17L7.91077 21.6153"
+                stroke="#81E0FF"
+                stroke-width="2.30763"
+              />
+            </svg>
+          </div>
+          <div class="topbarBtn danger" data-mode="edit">
+            <svg
+              width="35"
+              height="35"
+              viewBox="0 0 35 35"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7.21539 24.2372L3.33398 32L11.0968 28.1186M7.21539 24.2372L11.0968 28.1186M7.21539 24.2372L26.6224 4.83017M11.0968 28.1186L30.5038 8.71157M26.6224 4.83017L30.5038 8.71157M26.6224 4.83017C26.6224 4.83017 29.6349 0.0779618 32.4445 2.88947C35.2542 5.70098 30.5038 8.71157 30.5038 8.71157"
+                stroke="#81E0FF"
+                stroke-width="2.33327"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
       <div id="projectButtons" class="topbarButtons">
         <h2>Project</h2>
         <div class="buttonSet">
@@ -169,7 +230,7 @@
       <div id="appearanceButtons" class="last topbarButtons">
         <h2>Appearance</h2>
         <div class="buttonSet">
-          <div class="topbarBtn" data-appearance="autoLayout">
+          <div class="active toggle topbarBtn" data-appearance="autoLayout">
             <svg
               width="34"
               height="34"
@@ -244,7 +305,7 @@
               />
             </svg>
           </div>
-          <div class="topbarBtn" data-appearance="rightBar">
+          <div class="toggle topbarBtn" data-appearance="details">
             <svg
               width="38"
               height="38"

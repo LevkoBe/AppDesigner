@@ -1,8 +1,16 @@
 :root {
+  --color-primary-bg: 198, 71%, 3%;
   --color-primary-fg: 195, 100%, 75%;
   --color-danger: 0, 100%, 33%;
-  --color-selected: 87, 100%, 64%;
+  --color-active: 87, 100%, 64%;
   --topbar-height: 40px;
+
+  --color-white: #ffffff;
+  --color-yellow: #e9ff42;
+  --color-green: #4ade80;
+  --color-orange: #fb923c;
+  --color-purple: #a855f7;
+  --color-blue: #3b82f6;
 }
 
 * {
@@ -14,7 +22,7 @@
 }
 
 html {
-  background-color: #02090c;
+  background-color: hsl(var(--color-primary-bg));
   width: 100vw;
   height: 100vh;
 }
@@ -27,6 +35,7 @@ body {
 #topBar {
   height: var(--topbar-height);
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -38,7 +47,7 @@ body {
   align-items: center;
   width: fit-content;
   height: 100%;
-  padding: 10px 10px 10px 32px;
+  padding: 5px 5px 5px 30px;
   gap: 32px;
   border-radius: calc(var(--topbar-height) / 2);
   border: 1px solid hsl(var(--color-primary-fg));
@@ -46,8 +55,8 @@ body {
 }
 
 .topbarButtons:hover {
-  box-shadow: 0 0 15px hsla(var(--color-primary-fg), 0.3);
-  transform: translateY(-1px);
+  background-color: hsla(var(--color-primary-fg), 0.05);
+  border-color: hsl(var(--color-selected));
 }
 
 .first.topbarButtons {
@@ -95,15 +104,17 @@ body {
 }
 
 .danger.topbarBtn:hover {
-  transform: scale(1.1);
   box-shadow: 0 4px 12px hsla(var(--color-danger), 0.4);
   background-color: hsla(var(--color-danger), 0.3);
 }
 
-.selected.topbarBtn {
-  background-color: hsla(var(--color-selected), 0.3);
-  border-color: hsl(var(--color-selected));
-  box-shadow: 0 0 8px hsla(var(--color-selected), 0.4);
+.active.topbarBtn {
+  background-color: hsla(var(--color-active), 0.2);
+  border: 1px solid hsl(var(--color-active));
+}
+.active.topbarBtn:hover {
+  box-shadow: 0 4px 12px hsla(var(--color-active), 0.4);
+  background-color: hsla(var(--color-active), 0.3);
 }
 
 .topbarBtn svg {
@@ -124,10 +135,35 @@ body {
   stroke: hsl(var(--color-danger));
 }
 
-.selected.topbarBtn svg path {
-  stroke: hsl(var(--color-selected));
+.active.topbarBtn svg path {
+  stroke: hsl(var(--color-active));
 }
 
 .hidden {
   display: none;
+}
+
+#canvasContainer {
+  width: 100%;
+  height: calc(100% - var(--topbar-height));
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  position: relative;
+}
+
+#status {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--color-primary-fg);
+  border: 1px solid hsl(var(--color-primary-fg));
 }

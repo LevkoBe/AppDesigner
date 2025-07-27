@@ -9,29 +9,29 @@
   overflow-y: auto;
   background: linear-gradient(
     180deg,
-    rgba(var(--rgb-gray-15), 0.95) 0%,
-    rgba(var(--rgb-gray-35), 0.95) 100%
+    hsla(var(--color-primary-fg), 0.1) 0%,
+    hsla(var(--color-primary-fg), 0.15) 100%
   );
   backdrop-filter: blur(15px);
   padding: 25px;
-  box-shadow: var(--shadow-bar);
-  border-left: 1px solid rgba(var(--rgb-gray-60), 0.8);
-  color: var(--color-light-gray);
+  box-shadow: 0 4px 20px hsla(var(--color-primary-fg), 0.2);
+  border-left: 1px solid hsla(var(--color-primary-fg), 0.3);
+  color: hsl(var(--color-primary-fg));
 }
 
 .bar h2 {
   margin: 0 0 25px 0;
   font-size: 20px;
-  color: var(--color-white);
+  color: hsl(var(--color-primary-fg));
   text-align: center;
-  border-bottom: 2px solid rgba(var(--rgb-gray-80), 0.7);
+  border-bottom: 2px solid hsla(var(--color-primary-fg), 0.4);
   padding-bottom: 12px;
-  text-shadow: 0 0 8px rgba(var(--rgb-white), 0.3);
+  text-shadow: 0 0 8px hsla(var(--color-primary-fg), 0.5);
 }
 
 .propLabel {
   margin-top: 15px;
-  color: var(--color-gray-text-subtle);
+  color: hsla(var(--color-primary-fg), 0.7);
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -39,38 +39,38 @@
 
 .readonlyProp {
   margin: 10px 0;
-  background-color: rgba(var(--rgb-gray-60), 0.6);
+  background-color: hsla(var(--color-primary-fg), 0.1);
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid rgba(var(--rgb-gray-80), 0.7);
-  box-shadow: var(--shadow-inset-readonly);
+  border: 1px solid hsla(var(--color-primary-fg), 0.3);
+  box-shadow: inset 0 2px 4px hsla(var(--color-primary-fg), 0.1);
   font-family: monospace;
   font-size: 13px;
 }
 
 .propValue {
   margin-left: 8px;
-  color: var(--color-light-gray);
+  color: hsl(var(--color-primary-fg));
 }
 
 .propInput {
   width: calc(100% - 20px);
   margin-top: 8px;
   padding: 10px;
-  border: 1px solid var(--color-gray-input-border);
+  border: 1px solid hsla(var(--color-primary-fg), 0.4);
   border-radius: 6px;
-  background-color: rgba(var(--rgb-gray-40), 0.7);
-  color: var(--color-light-gray);
+  background-color: hsla(var(--color-primary-fg), 0.1);
+  color: hsl(var(--color-primary-fg));
   font-size: 14px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .propInput:focus {
   outline: none;
-  border-color: var(--color-blue-primary);
-  box-shadow: var(--shadow-input-focus-blue),
-    var(--shadow-input-focus-inset-blue);
-  background-color: rgba(var(--rgb-gray-50), 0.8);
+  border-color: hsl(var(--color-active));
+  box-shadow: 0 0 8px hsla(var(--color-active), 0.4),
+    inset 0 2px 4px hsla(var(--color-active), 0.1);
+  background-color: hsla(var(--color-primary-fg), 0.15);
 }
 
 .custom-select {
@@ -87,10 +87,10 @@
 }
 
 .customDropdown .propLabel {
-  background-color: rgba(var(--rgb-gray-50), 0.8);
-  color: var(--color-light-gray);
+  background-color: hsla(var(--color-primary-fg), 0.15);
+  color: hsl(var(--color-primary-fg));
   padding: 10px 40px 10px 12px;
-  border: 1px solid var(--color-gray-input-border);
+  border: 1px solid hsla(var(--color-primary-fg), 0.4);
   border-radius: 6px;
   cursor: pointer;
   position: relative;
@@ -98,7 +98,7 @@
   width: 100%;
   box-sizing: border-box;
   transition: all 0.3s ease;
-  box-shadow: var(--shadow-dropdown-label);
+  box-shadow: 0 2px 4px hsla(var(--color-primary-fg), 0.1);
 }
 
 .customDropdown .propLabel::after {
@@ -107,7 +107,7 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-gray-arrow);
+  color: hsla(var(--color-primary-fg), 0.7);
   pointer-events: none;
   font-size: 10px;
   transition: transform 0.3s ease;
@@ -118,9 +118,9 @@
 }
 
 .customDropdown .propLabel:hover {
-  background-color: rgba(var(--rgb-gray-60), 0.9);
-  border-color: var(--color-gray-medium-dark);
-  box-shadow: var(--shadow-dropdown-label-hover);
+  background-color: hsla(var(--color-primary-fg), 0.2);
+  border-color: hsla(var(--color-primary-fg), 0.6);
+  box-shadow: 0 4px 8px hsla(var(--color-primary-fg), 0.2);
 }
 
 .propDrop {
@@ -129,41 +129,41 @@
   top: 100%;
   left: 0;
   right: 0;
-  background-color: rgba(var(--rgb-gray-30), 0.95);
-  border: 1px solid var(--color-gray-input-border);
+  background-color: hsla(var(--color-primary-fg), 0.1);
+  border: 1px solid hsla(var(--color-primary-fg), 0.4);
   border-top: none;
   border-radius: 0 0 6px 6px;
   max-height: 180px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: var(--shadow-dropdown);
+  box-shadow: 0 8px 16px hsla(var(--color-primary-fg), 0.3);
 }
 
 .propOpt {
   padding: 10px 12px;
-  color: var(--color-light-gray);
+  color: hsl(var(--color-primary-fg));
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
   font-size: 14px;
 }
 
 .propOpt:hover {
-  background-color: rgba(var(--rgb-blue-primary), 0.3);
-  color: var(--color-white);
+  background-color: hsla(var(--color-active), 0.3);
+  color: hsl(var(--color-active));
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(var(--rgb-gray-20), 0.5);
+  background: hsla(var(--color-primary-fg), 0.1);
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-blue-primary);
+  background: hsl(var(--color-active));
   border-radius: 5px;
-  border: 1px solid var(--color-blue-scrollbar-thumb-hover);
+  border: 1px solid hsla(var(--color-active), 0.8);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-blue-scrollbar-thumb-hover);
+  background: hsla(var(--color-active), 0.8);
 }
