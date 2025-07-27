@@ -33,7 +33,7 @@ export class RuleFeedback {
   }
 
   hide() {
-    if (this.popup) {
+    if (this.popup && this.popup.classList.contains("show")) {
       this.popup.classList.remove("show");
       void this.popup.offsetWidth;
       this.popup.classList.add("hide");

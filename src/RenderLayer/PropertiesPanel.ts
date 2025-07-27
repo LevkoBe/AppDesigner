@@ -1,18 +1,12 @@
-import { AppState } from "../LogicLayer/AppState.ts";
 import { AppElement } from "../_models/AppElement.ts";
 
 export class PropertiesPanel {
-  private appState: AppState;
-  private panelContainer = document.getElementById("editbar")!;
+  private panelContainer = document.getElementById("rightBar")!;
   private textInput = this._createInputField("Name");
   private idField = this._createReadOnlyProperty("ID");
   private typeField = this._createReadOnlyProperty("Type");
   private xField = this._createReadOnlyProperty("Pos X");
   private yField = this._createReadOnlyProperty("Pos Y");
-
-  constructor(appState: AppState) {
-    this.appState = appState;
-  }
 
   private _createReadOnlyProperty(label: string): HTMLElement {
     return this._createElement(
@@ -55,11 +49,11 @@ export class PropertiesPanel {
 
   updatePanel = (element: AppElement | undefined) => {
     if (!element) {
-      this.panelContainer.classList.add("hidden");
+      this.panelContainer.classList.add("hid");
       return;
     }
 
-    this.panelContainer.classList.remove("hidden");
+    this.panelContainer.classList.remove("hid");
     this.idField.textContent = element.id.toString();
     this.typeField.textContent = element.type;
     this.textInput.value = element.text;

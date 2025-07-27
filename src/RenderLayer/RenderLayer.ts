@@ -1,9 +1,8 @@
-import { Mode } from "fs";
 import { Connection } from "../_models/Connection.js";
 import { AppElement } from "../_models/AppElement.js";
 import { AppState } from "../LogicLayer/AppState.js";
 import { PropertiesPanel } from "./PropertiesPanel.js";
-import { ElementType } from "../types.js";
+import { CreationType, Mode } from "../types.js";
 import { ElementFactory } from "./ElementFactory.js";
 
 export class RenderLayer {
@@ -13,20 +12,23 @@ export class RenderLayer {
   private elementFactory: ElementFactory;
 
   constructor(private canvas: HTMLElement, private state: AppState) {
-    this.propertiesPanel = new PropertiesPanel(state);
+    this.propertiesPanel = new PropertiesPanel();
     this.elementFactory = new ElementFactory();
+    this.updateCanvasCursor();
   }
 
   render() {
     this.updateStatus();
-    this.updateElementTypeSelection();
+    this.updateCanvasCursor();
     this.setCanvasTransform(this.state.zoom);
     this.renderElements(
       this.state.elements,
       this.state.selectedElement?.id ?? undefined
     );
     this.renderConnections(this.state.connections);
-    this.propertiesPanel.updatePanel(this.state.selectedElement);
+    this.propertiesPanel.updatePanel(
+      this.state.showDetails ? this.state.selectedElement : undefined
+    );
     this.state.rerenderNeeded = false;
   }
 
@@ -170,34 +172,47 @@ export class RenderLayer {
     return this.propertiesPanel.getInputs();
   }
 
-  updateElementTypeSelection() {
-    const selector = document.getElementById("elementTypeSelection")!;
-    if (this.state.currentMode === "create")
-      selector.classList.remove("hidden");
-    else selector.classList.add("hidden");
+  private updateCanvasCursor() {
+    const canvasContainer = document.getElementById("canvasContainer");
+    if (!canvasContainer) return;
+
+    const cursorModes: Mode[] = ["create", "remove", "move", "edit"];
+
+    cursorModes.forEach((mode) =>
+      canvasContainer.classList.remove(`cursor-${mode}`)
+    );
+
+    if (cursorModes.includes(this.state.currentMode)) {
+      canvasContainer.classList.add(`cursor-${this.state.currentMode}`);
+    }
   }
 
   updateStatus() {
     const modeText: Record<Mode, string> = {
-      create: "Create/Child Mode",
-      connect: "Connection Mode",
-      move: "Movement Mode",
+      create: "Create Mode",
+      remove: "Remove Mode",
+      move: "Move Mode",
       edit: "Edit Mode",
     };
-    const elementText: Record<ElementType, string> = {
-      collection: "Collections",
-      function: "Functions",
-      object: "Objects",
-      input: "Inputs",
-      output: "Outputs",
+
+    const creationText: Record<CreationType, string> = {
+      collection: "Collection",
+      function: "Function",
+      object: "Object",
+      input: "Input",
+      output: "Output",
+      connection: "Connection",
+      flow: "Flow",
     };
 
-    let statusText = `${modeText[this.state.currentMode]}`;
-    if (this.state.currentMode === "create")
-      statusText += ` - ${elementText[this.state.currentElementType]}`;
+    let statusText = modeText[this.state.currentMode];
 
-    if (this.state.currentMode === "connect" && this.state.fromElement) {
-      statusText += " - Select target element";
+    if (this.state.currentMode === "create") {
+      statusText += ` - ${creationText[this.state.currentCreationType]}`;
+    }
+
+    if (this.state.editingElement) {
+      statusText += " - Editing";
     }
 
     const status = document.getElementById("status");

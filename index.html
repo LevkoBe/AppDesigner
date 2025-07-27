@@ -15,11 +15,11 @@
     />
   </head>
   <body>
-    <div class="hidden context-menu" id="contextMenu">
-      <div class="context-menu-item" id="editBtn">Edit</div>
-      <div class="context-menu-item" id="duplicateBtn">Duplicate</div>
-      <div class="context-menu-separator"></div>
-      <div class="context-menu-item" id="deleteBtn">Delete</div>
+    <div class="hidden" id="contextMenu">
+      <div class="option" data-option="edit">Edit</div>
+      <div class="option" data-option="duplicate">Duplicate</div>
+      <div class="separator"></div>
+      <div class="option" data-option="delete">Delete</div>
     </div>
     <div id="topBar">
       <div id="createButtons" class="first topbarButtons">
@@ -55,7 +55,7 @@
               />
             </svg>
           </div>
-          <div class="topbarBtn" data-create="object">
+          <div class="active topbarBtn" data-create="object">
             <svg
               width="36"
               height="30"
@@ -119,7 +119,7 @@
       <div id="modeButtons" class="topbarButtons">
         <h2>Mode</h2>
         <div class="buttonSet">
-          <div class="topbarBtn" data-mode="create">
+          <div class="active topbarBtn" data-mode="create">
             <svg
               width="26"
               height="26"
@@ -160,7 +160,7 @@
               />
             </svg>
           </div>
-          <div class="topbarBtn danger" data-mode="edit">
+          <div class="topbarBtn" data-mode="edit">
             <svg
               width="35"
               height="35"
@@ -305,7 +305,7 @@
               />
             </svg>
           </div>
-          <div class="toggle topbarBtn" data-appearance="details">
+          <div class="active toggle topbarBtn" data-appearance="details">
             <svg
               width="38"
               height="38"
@@ -327,7 +327,7 @@
       <div class="canvas" id="canvas"></div>
       <div class="status" id="status">Ready - Create/Child Mode</div>
 
-      <div id="rightBar" class="hidden bar">
+      <div id="rightBar" class="hid bar">
         <h2>Element Properties</h2>
         <div id="readonlyProps">
           <div id="readonlyPropTemplate" class="readonlyProp">

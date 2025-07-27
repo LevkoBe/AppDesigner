@@ -24,6 +24,7 @@ type ElementAction =
   | "create"
   | "duplicate"
   | "connect"
+  | "disconnect"
   | "select"
   | "delete"
   | "anchor"
@@ -35,8 +36,7 @@ export type Action =
   | HelperAction
   | ElementAction
   | "none"
-  | "mode"
-  | "type";
+  | "mode";
 
 export interface Point {
   x: number;

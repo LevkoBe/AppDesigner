@@ -30,6 +30,9 @@ html {
 body {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 #topBar {
@@ -148,13 +151,14 @@ body {
   height: calc(100% - var(--topbar-height));
   position: relative;
   overflow: hidden;
+  display: flex;
 }
 
 #canvas {
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
+  flex: 5;
+  border: 1px solid hsl(var(--color-primary-fg));
   position: relative;
+  transition: flex 3s ease, flex-basis 0.3s ease;
 }
 
 #status {
@@ -166,4 +170,45 @@ body {
   font-size: 13px;
   color: var(--color-primary-fg);
   border: 1px solid hsl(var(--color-primary-fg));
+}
+
+#contextMenu {
+  position: absolute;
+  backdrop-filter: blur(12px);
+  border-radius: 10px;
+  padding: 8px;
+  border: 1px solid hsla(var(--color-primary-fg), 0.2);
+  min-width: 80px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.option {
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.5s ease;
+}
+
+.option:hover {
+  color: var(--color-white);
+  background-color: hsla(var(--color-primary-fg), 0.2);
+}
+
+.separator {
+  height: 1px;
+  margin: 8px 0;
+}
+
+.cursor-create #canvas {
+  cursor: crosshair;
+}
+.cursor-remove #canvas {
+  cursor: not-allowed;
+}
+.cursor-move #canvas {
+  cursor: move;
+}
+.cursor-edit #canvas {
+  cursor: text;
 }

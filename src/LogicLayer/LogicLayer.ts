@@ -31,7 +31,7 @@ export class LogicLayer {
     if (!this.inputState.isEditing) this.appState.editingElement = undefined;
 
     switch (this.inputState.getAction) {
-      case "layout":
+      case "autoLayout":
         this.appState.autoLayout = !this.appState.autoLayout;
         if (this.appState.autoLayout) {
           this.restartLayout();
@@ -56,6 +56,14 @@ export class LogicLayer {
         activeId = this.inputState.activeId;
         secondaryId = undefined;
         this.tryRestartLayout();
+        break;
+
+      case "disconnect":
+        // todo
+        break;
+
+      case "details":
+        this.appState.showDetails = !this.appState.showDetails;
         break;
 
       case "select":
@@ -85,11 +93,11 @@ export class LogicLayer {
         this.appState.targetPosition = this.inputState.mousePosition;
         break;
 
-      case "save":
+      case "export":
         this.projectManager.saveProject();
         break;
 
-      case "load":
+      case "import":
         this.projectManager.loadProject();
         this.tryRestartLayout();
         break;
@@ -101,12 +109,12 @@ export class LogicLayer {
 
       case "zoomIn":
       case "zoomOut":
-      case "resetView":
+      case "zoomReset":
         this.appState.zoom = this.inputState.zoom;
         this.appState.pan = this.inputState.pan;
         break;
 
-      case "changeMode":
+      case "mode":
         this.appState.currentMode = this.inputState.currentMode;
         break;
     }
