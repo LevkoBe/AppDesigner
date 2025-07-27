@@ -1,11 +1,3 @@
-:root {
-  --color-yellow: #e9ff42;
-  --color-green: #4ade80;
-  --color-orange: #fb923c;
-  --color-purple: #a855f7;
-  --color-blue: #3b82f6;
-}
-
 /* element itself */
 .element {
   position: absolute;
@@ -19,7 +11,7 @@
   z-index: var(--depth);
   --element-gradient: radial-gradient(
     circle,
-    rgba(156, 163, 175, 0.3) 0%,
+    hsla(var(--color-primary-fg), 0.3) 0%,
     transparent 100%
   );
   --stroke-width: 15px;
@@ -48,13 +40,13 @@
   position: absolute;
   width: 130%;
   height: 130%;
-  stroke: rgba(var(--color-gray-90), 0.8);
+  stroke: hsla(var(--color-primary-fg), 0.8);
   stroke-width: 15px;
   box-sizing: border-box;
 }
 .element .element-svg path {
   fill: none;
-  stroke: var(--color-light-gray);
+  stroke: hsl(var(--color-primary-fg));
   stroke-width: var(--stroke-width);
   transition: stroke 0.3s ease;
 }
