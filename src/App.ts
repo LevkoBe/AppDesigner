@@ -36,7 +36,7 @@ export class App {
         if (
           this.inputState.getAction !== "none" ||
           this.appState.rerenderNeeded ||
-          this.appState.autoLayout
+          this.appState.layout
         ) {
           this.logicLayer.processInput();
           this.renderLayer.render();

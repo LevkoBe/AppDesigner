@@ -1,10 +1,8 @@
 import { AppElement } from "../_models/AppElement.js";
-import { Action, ElementType, Point, Mode, CreationType } from "../types.js";
+import { Action, ElementType, Point, Mode } from "../types.js";
 
 export class InputState {
   #action: Action = "none";
-  #creationType: CreationType = "object";
-
   elementType: ElementType = "object";
   currentMode: Mode = "create";
   shiftKey: boolean = false;
@@ -33,40 +31,35 @@ export class InputState {
     }
   }
 
-  setType(creationType: CreationType) {
-    this.#creationType = creationType;
-  }
-
   clear() {
     this.setAction("none");
   }
 
-  handleCreateAction(elementId?: string) {
-    if (this.#creationType === "connection" || this.#creationType === "flow") {
-      if (!elementId) {
-        this.activeId = undefined;
-        this.setAction("select");
-        return;
-      }
-      const secondary =
-        this.activeId !== elementId
-          ? this.activeId
-          : this.secondaryId !== elementId
-          ? this.secondaryId
-          : undefined;
-      this.activeId = elementId;
-      if (!secondary) {
-        this.setAction("select");
-        return;
-      }
-      this.secondaryId = secondary;
-      this.setAction(this.shiftKey ? "disconnect" : "connect");
+  handleConnectAction(elementId?: string) {
+    if (!elementId) {
+      this.activeId = undefined;
+      this.setAction("select");
       return;
-    } else {
-      this.elementType = this.#creationType;
-      this.activeId = elementId;
-      this.setAction(elementId && this.shiftKey ? "delete" : "create");
     }
+    const secondary =
+      this.activeId !== elementId
+        ? this.activeId
+        : this.secondaryId !== elementId
+        ? this.secondaryId
+        : undefined;
+    this.activeId = elementId;
+    if (!secondary) {
+      this.setAction("select");
+      return;
+    }
+    this.secondaryId = secondary;
+    this.setAction(this.shiftKey ? "disconnect" : "connect");
+    return;
+  }
+
+  handleCreateAction(elementId?: string) {
+    this.activeId = elementId;
+    this.setAction(elementId && this.shiftKey ? "delete" : "create");
   }
 
   interpretClick(x: number, y: number, elementId?: string) {
@@ -76,6 +69,10 @@ export class InputState {
       case "create":
         this.handleCreateAction(elementId);
         return;
+
+      case "connect":
+        this.handleConnectAction(elementId);
+        break;
 
       case "edit":
         this.interpretAction(elementId ? "edit" : "none");
@@ -93,8 +90,8 @@ export class InputState {
     this.interpretAction("mode");
   }
 
-  interpretTypeChange(type: CreationType) {
-    this.setType(type);
+  interpretTypeChange(type: ElementType) {
+    this.elementType = type;
     this.interpretAction("select");
   }
 

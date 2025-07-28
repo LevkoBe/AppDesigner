@@ -31,9 +31,9 @@ export class LogicLayer {
     if (!this.inputState.isEditing) this.appState.editingElement = undefined;
 
     switch (this.inputState.getAction) {
-      case "autoLayout":
-        this.appState.autoLayout = !this.appState.autoLayout;
-        if (this.appState.autoLayout) {
+      case "layout":
+        this.appState.layout = !this.appState.layout;
+        if (this.appState.layout) {
           this.restartLayout();
         } else {
           this.layout.stop();
@@ -63,7 +63,7 @@ export class LogicLayer {
         break;
 
       case "details":
-        this.appState.showDetails = !this.appState.showDetails;
+        this.appState.details = !this.appState.details;
         break;
 
       case "select":
@@ -127,6 +127,9 @@ export class LogicLayer {
       : undefined;
     this.inputState.activeId = activeId;
     this.inputState.secondaryId = secondaryId;
+
+    this.appState.currentMode = this.inputState.currentMode;
+    this.appState.elementType = this.inputState.elementType;
   }
 
   private handleCreate(): string | undefined {
@@ -249,7 +252,7 @@ export class LogicLayer {
   }
 
   private tryRestartLayout() {
-    if (this.appState.autoLayout) {
+    if (this.appState.layout) {
       this.restartLayout();
     }
   }

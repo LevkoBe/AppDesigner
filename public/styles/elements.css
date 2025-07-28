@@ -42,7 +42,6 @@
   height: 130%;
   stroke: hsla(var(--color-primary-fg), 0.8);
   stroke-width: 15px;
-  box-sizing: border-box;
 }
 .element .element-svg path {
   fill: none;
@@ -56,7 +55,6 @@
   z-index: 2;
   position: relative;
   padding: 2px 5px;
-  box-sizing: border-box;
 }
 .element-text {
   white-space: nowrap;

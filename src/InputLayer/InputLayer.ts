@@ -1,6 +1,6 @@
 import { InputState } from "./InputState.ts";
 import { AppElement } from "../_models/AppElement.ts";
-import { Action, CreationType, Mode } from "../types.ts";
+import { Action, ElementType, Mode } from "../types.ts";
 
 export class InputLayer {
   constructor(
@@ -42,20 +42,6 @@ export class InputLayer {
   ) {
     document.querySelectorAll(selector).forEach((btn) => {
       btn.addEventListener("click", () => {
-        const isToggle = btn.classList.contains("toggle");
-
-        if (isToggle) {
-          btn.classList.toggle("active");
-        } else {
-          document.querySelectorAll(selector).forEach((b) => {
-            if (!b.classList.contains("toggle")) {
-              b.classList.remove("active");
-            }
-          });
-
-          btn.classList.add("active");
-        }
-
         const key = selector.replace("[data-", "").replace("]", "");
         const value = (btn as HTMLElement).dataset[key];
         if (value) {
@@ -67,7 +53,7 @@ export class InputLayer {
 
   private setupButtons() {
     this.setupActiveButtonGroup("[data-create]", (createType) => {
-      this.inputState.interpretTypeChange(createType as CreationType);
+      this.inputState.interpretTypeChange(createType as ElementType);
     });
     this.setupActiveButtonGroup("[data-mode]", (mode) => {
       this.inputState.interpretModeChange(mode as Mode);

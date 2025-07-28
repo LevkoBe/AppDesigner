@@ -6,9 +6,6 @@ export const elementTypeList = [
   "output",
 ] as const;
 export type ElementType = (typeof elementTypeList)[number];
-export const connectionTypeList = ["connection", "flow"] as const;
-export type ConnectionType = (typeof connectionTypeList)[number];
-export type CreationType = ElementType | ConnectionType;
 export type ElementState =
   | "selected"
   | "child"
@@ -16,9 +13,15 @@ export type ElementState =
   | "anchored"
   | "secondary";
 
-export type Mode = "create" | "remove" | "move" | "edit";
+export type Mode =
+  | "create"
+  | "remove"
+  | "connect"
+  | "disconnect"
+  | "move"
+  | "edit";
 type ProjectAction = "import" | "export" | "clear";
-type AppearanceAction = "autoLayout" | "zoomIn" | "zoomOut" | "zoomReset";
+type AppearanceAction = "layout" | "zoomIn" | "zoomOut" | "zoomReset";
 type HelperAction = "menu" | "details";
 type ElementAction =
   | "create"

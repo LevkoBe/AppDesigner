@@ -2,17 +2,20 @@ import { Connection } from "../_models/Connection.js";
 import { AppElement } from "../_models/AppElement.js";
 import { AppState } from "../LogicLayer/AppState.js";
 import { PropertiesPanel } from "./PropertiesPanel.js";
-import { CreationType, Mode } from "../types.js";
+import { ElementType, Mode } from "../types.js";
 import { ElementFactory } from "./ElementFactory.js";
+import { TopBar } from "./TopBar.js";
 
 export class RenderLayer {
   private elementMap = new Map<string, HTMLElement>();
   private connectionMap = new Map<string, SVGElement>();
   private propertiesPanel: PropertiesPanel;
   private elementFactory: ElementFactory;
+  private topBar: TopBar;
 
   constructor(private canvas: HTMLElement, private state: AppState) {
     this.propertiesPanel = new PropertiesPanel();
+    this.topBar = new TopBar();
     this.elementFactory = new ElementFactory();
     this.updateCanvasCursor();
   }
@@ -27,8 +30,14 @@ export class RenderLayer {
     );
     this.renderConnections(this.state.connections);
     this.propertiesPanel.updatePanel(
-      this.state.showDetails ? this.state.selectedElement : undefined
+      this.state.details ? this.state.selectedElement : undefined
     );
+    this.topBar.updateCreate(
+      this.state.elementType,
+      this.state.currentMode === "remove"
+    );
+    this.topBar.updateMode(this.state.currentMode);
+    this.topBar.updateAppearance(this.state.layout, this.state.details);
     this.state.rerenderNeeded = false;
   }
 
@@ -191,24 +200,24 @@ export class RenderLayer {
     const modeText: Record<Mode, string> = {
       create: "Create Mode",
       remove: "Remove Mode",
+      connect: "Connect Mode",
+      disconnect: "Disconnect Mode",
       move: "Move Mode",
       edit: "Edit Mode",
     };
 
-    const creationText: Record<CreationType, string> = {
+    const creationText: Record<ElementType, string> = {
       collection: "Collection",
       function: "Function",
       object: "Object",
       input: "Input",
       output: "Output",
-      connection: "Connection",
-      flow: "Flow",
     };
 
     let statusText = modeText[this.state.currentMode];
 
     if (this.state.currentMode === "create") {
-      statusText += ` - ${creationText[this.state.currentCreationType]}`;
+      statusText += ` - ${creationText[this.state.elementType]}`;
     }
 
     if (this.state.editingElement) {

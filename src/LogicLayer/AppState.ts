@@ -2,7 +2,6 @@ import { AppElement } from "../_models/AppElement.ts";
 import { Connection } from "../_models/Connection.ts";
 import {
   ConnectionData,
-  CreationType,
   ElementData,
   ElementType,
   Mode,
@@ -11,7 +10,7 @@ import {
 
 export class AppState {
   currentMode: Mode = "create";
-  currentCreationType: CreationType = "object";
+  elementType: ElementType = "object";
   elements: AppElement[] = [];
   connections: Connection[] = [];
   selectedElement: AppElement | undefined;
@@ -22,15 +21,11 @@ export class AppState {
   contextMenu: boolean = false;
   targetPosition?: Point;
   rerenderNeeded: boolean = false;
-  autoLayout: boolean = true;
-  showDetails: boolean = true;
+  layout: boolean = true;
+  details: boolean = true;
 
   setMode(mode: Mode) {
     this.currentMode = mode;
-  }
-
-  setElementType(type: ElementType) {
-    this.currentCreationType = type;
   }
 
   addElement(element: AppElement) {
