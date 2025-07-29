@@ -21,25 +21,59 @@ export class InputState {
     return this.#action;
   }
 
-  setAction(action: Action) {
+  handleAction(action: Action, text?: string) {
     this.#action = action;
-    if (action === "edit") this.isEditing = true;
-    else if (action !== "none") {
-      this.isEditing = false;
-      this.text = undefined;
-      if (action !== "connect") this.secondaryId = undefined;
+
+    switch (action) {
+      case "none":
+        return;
+      case "edit":
+        this.handleEditAction(text);
+        return;
+      case "connect":
+        this.#action = this.handleConnectAction();
+        return;
+      case "create":
+        this.#action = this.handleCreateAction();
+        break;
+      case "zoomIn":
+        this.zoom *= 1.2;
+        break;
+      case "zoomOut":
+        this.zoom /= 1.2;
+        break;
+      case "zoomReset":
+        this.zoom = 1;
+        this.pan = { x: 0, y: 0 };
+        break;
+      case "duplicate":
+        action = "create";
+        this.activeId = undefined;
+        break;
     }
+
+    this.resetState();
   }
 
   clear() {
-    this.setAction("none");
+    this.#action = "none";
   }
 
-  handleConnectAction(elementId?: string) {
+  handleEditAction(text?: string) {
+    this.text = text;
+    this.isEditing = true;
+  }
+
+  resetState() {
+    this.isEditing = false;
+    this.text = undefined;
+    this.secondaryId = undefined;
+  }
+
+  handleConnectAction(elementId?: string): Action {
     if (!elementId) {
       this.activeId = undefined;
-      this.setAction("select");
-      return;
+      return "select";
     }
     const secondary =
       this.activeId !== elementId
@@ -49,37 +83,27 @@ export class InputState {
         : undefined;
     this.activeId = elementId;
     if (!secondary) {
-      this.setAction("select");
-      return;
+      return "select";
     }
     this.secondaryId = secondary;
-    this.setAction(this.shiftKey ? "disconnect" : "connect");
-    return;
+    return this.shiftKey ? "disconnect" : "connect";
   }
 
-  handleCreateAction(elementId?: string) {
+  handleCreateAction(elementId?: string): Action {
     this.activeId = elementId;
-    this.setAction(elementId && this.shiftKey ? "delete" : "create");
+    return elementId && this.shiftKey ? "delete" : "create";
   }
 
   interpretClick(x: number, y: number, elementId?: string) {
     this.mousePosition = { x, y };
+    this.activeId = elementId;
 
     switch (this.currentMode) {
       case "create":
-        this.handleCreateAction(elementId);
-        return;
-
       case "connect":
-        this.handleConnectAction(elementId);
-        break;
-
       case "edit":
-        this.interpretAction(elementId ? "edit" : "none");
-        break;
-
       case "move":
-        this.interpretAction(elementId ? "select" : "none");
+        this.handleAction(this.currentMode);
         break;
     }
     this.activeId = elementId;
@@ -87,17 +111,17 @@ export class InputState {
 
   interpretModeChange(mode: Mode) {
     this.currentMode = mode;
-    this.interpretAction("mode");
+    this.handleAction("mode");
   }
 
   interpretTypeChange(type: ElementType) {
     this.elementType = type;
-    this.interpretAction("select");
+    this.handleAction("select");
   }
 
   interpretDrag(elementId: string, mouseX: number, mouseY: number) {
     if (this.currentMode !== "move" || !this.dragOffset) return;
-    this.interpretAction("move");
+    this.handleAction("move");
     const x = mouseX - this.dragOffset.x;
     const y = mouseY - this.dragOffset.y;
     this.secondaryId = elementId;
@@ -126,14 +150,14 @@ export class InputState {
 
   interpretDoubleClick(x: number, y: number, elementId?: string) {
     if (elementId) {
-      this.interpretAction("edit");
+      this.handleAction("edit");
       this.activeId = elementId;
       this.mousePosition = { x, y };
     }
   }
 
   interpretContextMenu(e_x: number, e_y: number, elementId?: string) {
-    if (elementId || this.activeId) this.interpretAction("menu");
+    if (elementId || this.activeId) this.handleAction("menu");
 
     if (elementId) {
       this.activeId = elementId;
@@ -141,37 +165,8 @@ export class InputState {
     }
   }
 
-  interpretAction(action: Action) {
-    switch (action) {
-      case "zoomIn":
-        this.zoom *= 1.2;
-        break;
-      case "zoomOut":
-        this.zoom /= 1.2;
-        break;
-      case "zoomReset":
-        this.zoom = 1;
-        this.pan = { x: 0, y: 0 };
-        break;
-      case "duplicate":
-        action = "create";
-        this.activeId = undefined;
-        break;
-      case "create":
-        this.handleCreateAction();
-        break;
-    }
-    this.setAction(action);
-  }
-
-  interpretTextEdit(elementId: string, text?: string) {
-    this.interpretAction("edit");
-    this.activeId = elementId;
-    this.text = text;
-  }
-
   interpretActionOnElement(action: Action, elementId?: string) {
     this.activeId = elementId;
-    this.interpretAction(action);
+    this.handleAction(action);
   }
 }

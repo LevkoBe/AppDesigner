@@ -59,14 +59,14 @@ export class InputLayer {
       this.inputState.interpretModeChange(mode as Mode);
     });
     this.setupActiveButtonGroup("[data-project]", (action) => {
-      this.inputState.interpretAction(action as Action);
+      this.inputState.handleAction(action as Action);
     });
     this.setupActiveButtonGroup("[data-appearance]", (action) => {
-      this.inputState.interpretAction(action as Action);
+      this.inputState.handleAction(action as Action);
     });
 
     this.setupActiveButtonGroup("[data-option]", (action) => {
-      this.inputState.interpretAction(action as Action);
+      this.inputState.handleAction(action as Action);
     });
   }
 
@@ -147,14 +147,14 @@ export class InputLayer {
     if (!activeId) return;
 
     const elementParent = target.closest(".element") as HTMLElement | null;
-    if (elementParent?.dataset.id === activeId && this.inputState.isEditing) {
-      this.inputState.interpretTextEdit(activeId, target.value);
+    if (elementParent?.dataset.id === activeId) {
+      this.inputState.handleAction("edit", target.value);
       return;
     }
 
     const panelInputs = this.getPanelInputsCallback();
     if (panelInputs.includes(target) && activeId) {
-      this.inputState.interpretTextEdit(activeId, target.value);
+      this.inputState.handleAction("edit", target.value);
     }
   };
 
@@ -164,8 +164,7 @@ export class InputLayer {
       KeyW: () => this.inputState.interpretModeChange("move"),
       KeyE: () => this.inputState.interpretModeChange("edit"),
       F2: () =>
-        this.inputState.activeId &&
-        this.inputState.interpretTextEdit(this.inputState.activeId),
+        this.inputState.activeId && this.inputState.handleAction("edit"),
       KeyA: () =>
         this.inputState.activeId &&
         this.inputState.interpretActionOnElement(
@@ -189,14 +188,14 @@ export class InputLayer {
     };
 
     const ctrlShortcuts = {
-      KeyS: () => this.inputState.setAction("export"),
-      KeyO: () => this.inputState.setAction("import"),
-      Equal: () => this.inputState.interpretAction("zoomIn"),
-      NumpadAdd: () => this.inputState.interpretAction("zoomIn"),
-      Minus: () => this.inputState.interpretAction("zoomOut"),
-      NumpadSubtract: () => this.inputState.interpretAction("zoomOut"),
-      Digit0: () => this.inputState.interpretAction("zoomReset"),
-      Numpad0: () => this.inputState.interpretAction("zoomReset"),
+      KeyS: () => this.inputState.handleAction("export"),
+      KeyO: () => this.inputState.handleAction("import"),
+      Equal: () => this.inputState.handleAction("zoomIn"),
+      NumpadAdd: () => this.inputState.handleAction("zoomIn"),
+      Minus: () => this.inputState.handleAction("zoomOut"),
+      NumpadSubtract: () => this.inputState.handleAction("zoomOut"),
+      Digit0: () => this.inputState.handleAction("zoomReset"),
+      Numpad0: () => this.inputState.handleAction("zoomReset"),
     };
 
     return { shortcuts, ctrlShortcuts };
@@ -228,9 +227,8 @@ export class InputLayer {
         handler();
         return;
       }
-
       if (this.inputState.isEditing && e.key === "Enter") {
-        this.inputState.setAction("select");
+        this.inputState.handleAction("select");
         e.preventDefault();
       }
     }
