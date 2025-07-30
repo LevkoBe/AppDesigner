@@ -17,12 +17,12 @@ describe("AppState", () => {
   describe("constructor", () => {
     test("should initialize with default values", () => {
       expect(appState.currentMode).toBe("create");
-      expect(appState.currentElementType).toBe("object");
+      expect(appState.elementType).toBe("object");
       expect(appState.elements).toEqual([]);
       expect(appState.connections).toEqual([]);
       expect(appState.zoom).toBe(1);
       expect(appState.pan).toEqual({ x: 0, y: 0 });
-      expect(appState.autoLayout).toBe(true);
+      expect(appState.layout).toBe(true);
     });
   });
 
