@@ -3,7 +3,7 @@
   --color-primary-fg: 195, 100%, 75%;
   --color-danger: 0, 100%, 33%;
   --color-active: 87, 100%, 64%;
-  --topbar-height: 40px;
+  --topbar-row-height: 40px;
 
   --color-white: #ffffff;
   --color-yellow: #e9ff42;
@@ -32,11 +32,11 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 #topBar {
-  height: var(--topbar-height);
+  height: fit-content;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
@@ -49,10 +49,10 @@ body {
   flex-direction: row;
   align-items: center;
   width: fit-content;
-  height: 100%;
+  height: var(--topbar-row-height);
   padding: 5px 5px 5px 30px;
   gap: 32px;
-  border-radius: calc(var(--topbar-height) / 2);
+  border-radius: calc(var(--topbar-row-height) / 2);
   border: 1px solid hsl(var(--color-primary-fg));
   transition: all 0.3s ease;
 }
@@ -63,13 +63,13 @@ body {
 }
 
 .first.topbarButtons {
-  border-radius: 0 calc(var(--topbar-height) / 2) calc(var(--topbar-height) / 2)
-    0;
+  border-radius: 0 calc(var(--topbar-row-height) / 2)
+    calc(var(--topbar-row-height) / 2) 0;
 }
 
 .last.topbarButtons {
-  border-radius: calc(var(--topbar-height) / 2) 0 0
-    calc(var(--topbar-height) / 2);
+  border-radius: calc(var(--topbar-row-height) / 2) 0 0
+    calc(var(--topbar-row-height) / 2);
 }
 
 .buttonSet {
@@ -86,8 +86,8 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: calc(var(--topbar-height) * 3 / 4);
-  height: calc(var(--topbar-height) * 3 / 4);
+  width: calc(var(--topbar-row-height) * 3 / 4);
+  height: calc(var(--topbar-row-height) * 3 / 4);
   background-color: hsla(var(--color-primary-fg), 0.2);
   border-radius: 50%;
   border: 1px solid hsl(var(--color-primary-fg));
@@ -148,7 +148,7 @@ body {
 
 #canvasContainer {
   width: 100%;
-  height: calc(100% - var(--topbar-height));
+  height: calc(100% - var(--topbar-row-height));
   position: relative;
   overflow: hidden;
   display: flex;

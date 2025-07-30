@@ -5,22 +5,23 @@
 }
 
 .bar {
-  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid hsl(var(--color-primary-fg));
   color: hsl(var(--color-primary-fg));
+  margin-left: 8px;
 
-  transition: all 1s ease;
+  transition: all 0.5s ease;
 
-  padding: 16px;
-  margin-left: 16px;
+  padding: 8px;
+  flex: 1;
   max-width: 300px;
   opacity: 1;
 }
 .bar.hid {
   padding: 0;
   margin-left: 0;
-  max-width: 0;
+  flex: 0;
   opacity: 0;
 }
 
@@ -98,7 +99,6 @@
   position: relative;
   display: block;
   width: 100%;
-  box-sizing: border-box;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px hsla(var(--color-primary-fg), 0.1);
 }
