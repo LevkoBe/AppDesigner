@@ -6,167 +6,122 @@ export class InputState {
   elementType: ElementType = "object";
   currentMode: Mode = "create";
   shiftKey: boolean = false;
-  mousePosition?: { x: number; y: number };
+  mousePosition?: Point;
   text?: string;
   isEditing: boolean = false;
-  dragOffset?: { x: number; y: number };
-  secondaryId?: string;
+  dragOffset?: Point;
   activeId?: string;
+  secondaryId?: string;
   zoom: number = 1;
   pan: Point = { x: 0, y: 0 };
 
-  constructor() {}
-
-  get getAction(): Action {
+  get action(): Action {
     return this.#action;
   }
 
-  handleAction(action: Action, text?: string) {
-    this.#action = action;
+  updateActiveId(elementId?: string) {
+    if (!!this.activeId && this.activeId !== elementId) {
+      this.secondaryId = this.activeId;
+    }
+    this.activeId = elementId;
+  }
 
-    switch (action) {
-      case "none":
-        return;
+  executeAction(action: Action, text?: string) {
+    this.#action = this.validateAction(action);
+
+    switch (this.#action) {
       case "edit":
-        this.handleEditAction(text);
+        this.text = text;
+        this.isEditing = true;
         return;
       case "connect":
-        this.#action = this.handleConnectAction();
         return;
-      case "create":
-        this.#action = this.handleCreateAction();
-        break;
       case "zoomIn":
         this.zoom *= 1.2;
-        break;
+        return;
       case "zoomOut":
         this.zoom /= 1.2;
-        break;
+        return;
       case "zoomReset":
         this.zoom = 1;
         this.pan = { x: 0, y: 0 };
-        break;
-      case "duplicate":
-        action = "create";
-        this.activeId = undefined;
-        break;
+        return;
     }
 
-    this.resetState();
-  }
-
-  clear() {
-    this.#action = "none";
-  }
-
-  handleEditAction(text?: string) {
-    this.text = text;
-    this.isEditing = true;
-  }
-
-  resetState() {
     this.isEditing = false;
     this.text = undefined;
     this.secondaryId = undefined;
   }
 
-  handleConnectAction(elementId?: string): Action {
-    if (!elementId) {
-      this.activeId = undefined;
-      return "select";
-    }
-    const secondary =
-      this.activeId !== elementId
-        ? this.activeId
-        : this.secondaryId !== elementId
-        ? this.secondaryId
-        : undefined;
-    this.activeId = elementId;
-    if (!secondary) {
-      return "select";
-    }
-    this.secondaryId = secondary;
-    return this.shiftKey ? "disconnect" : "connect";
-  }
-
-  handleCreateAction(elementId?: string): Action {
-    this.activeId = elementId;
-    return elementId && this.shiftKey ? "delete" : "create";
-  }
-
-  interpretClick(x: number, y: number, elementId?: string) {
+  onMouseDown(x: number, y: number, element?: AppElement) {
     this.mousePosition = { x, y };
-    this.activeId = elementId;
-
-    switch (this.currentMode) {
-      case "create":
-      case "connect":
-      case "edit":
-      case "move":
-        this.handleAction(this.currentMode);
-        break;
+    this.updateActiveId(element?.id);
+    if (element?.id && this.currentMode === "move") {
+      this.dragOffset = { x: x - element.x, y: y - element.y };
     }
-    this.activeId = elementId;
   }
-
-  interpretModeChange(mode: Mode) {
-    this.currentMode = mode;
-    this.handleAction("mode");
+  onMouseUp() {
+    this.dragOffset = undefined;
   }
-
-  interpretTypeChange(type: ElementType) {
-    this.elementType = type;
-    this.handleAction("select");
-  }
-
-  interpretDrag(elementId: string, mouseX: number, mouseY: number) {
-    if (this.currentMode !== "move" || !this.dragOffset) return;
-    this.handleAction("move");
-    const x = mouseX - this.dragOffset.x;
-    const y = mouseY - this.dragOffset.y;
-    this.secondaryId = elementId;
+  onClick(x: number, y: number, elementId?: string) {
     this.mousePosition = { x, y };
+    this.updateActiveId(elementId);
+    this.executeAction(this.currentMode as Action);
   }
-
-  interpretMouseDown(x: number, y: number, element?: AppElement) {
-    this.text = undefined;
-
-    this.mousePosition = { x, y };
-
-    this.secondaryId = element?.id;
-    if (element && this.currentMode === "move") {
-      this.dragOffset = {
-        x: x - element.x,
-        y: y - element.y,
-      };
-    }
-  }
-
-  interpretMouseUp() {
-    if (this.currentMode === "move") {
-      this.dragOffset = undefined;
-    }
-  }
-
-  interpretDoubleClick(x: number, y: number, elementId?: string) {
+  onDoubleClick(x: number, y: number, elementId?: string) {
     if (elementId) {
-      this.handleAction("edit");
-      this.activeId = elementId;
       this.mousePosition = { x, y };
-    }
-  }
-
-  interpretContextMenu(e_x: number, e_y: number, elementId?: string) {
-    if (elementId || this.activeId) this.handleAction("menu");
-
-    if (elementId) {
       this.activeId = elementId;
-      this.mousePosition = { x: e_x, y: e_y };
+      this.executeAction("edit");
+    }
+  }
+  onDrag(elementId: string, x: number, y: number) {
+    if (this.currentMode === "move" && this.dragOffset) {
+      this.activeId = elementId;
+      this.mousePosition = {
+        x: x - this.dragOffset.x,
+        y: y - this.dragOffset.y,
+      };
+      this.executeAction("move");
     }
   }
 
-  interpretActionOnElement(action: Action, elementId?: string) {
-    this.activeId = elementId;
-    this.handleAction(action);
+  onContextMenu(x: number, y: number, elementId?: string) {
+    if (elementId) {
+      this.mousePosition = { x, y };
+      this.activeId = elementId;
+      this.executeAction("menu");
+    }
+  }
+
+  setMode(mode: Mode) {
+    this.currentMode = mode;
+    this.executeAction("mode");
+  }
+  setElementType(type: ElementType) {
+    this.elementType = type;
+    this.executeAction("select");
+  }
+
+  validateAction(plannedAction: Action): Action {
+    switch (plannedAction) {
+      case "connect":
+        if (
+          !this.activeId ||
+          !this.secondaryId ||
+          this.activeId === this.secondaryId
+        )
+          return "select";
+        return this.shiftKey ? "disconnect" : "connect";
+      case "duplicate":
+        this.activeId = undefined;
+        return "create";
+      default:
+        return plannedAction;
+    }
+  }
+
+  clear() {
+    this.#action = "none";
   }
 }

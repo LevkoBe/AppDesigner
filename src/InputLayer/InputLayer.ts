@@ -13,6 +13,7 @@ export class InputLayer {
   }
 
   private setupEventListeners() {
+    // Canvas events
     this.canvas.addEventListener("click", this.handleClick);
     this.canvas.addEventListener("mousedown", this.handleMouseDown);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
@@ -20,6 +21,7 @@ export class InputLayer {
     this.canvas.addEventListener("dblclick", this.handleDoubleClick);
     this.canvas.addEventListener("contextmenu", this.handleContextMenu);
 
+    // Global events
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
     window.addEventListener("input", this.handleInput);
@@ -31,12 +33,12 @@ export class InputLayer {
   private setupPopupButtons() {
     const closeBtn = document.querySelector("#popup .closeBtn");
     if (!closeBtn) throw new Error("Popup button absent");
-    closeBtn?.addEventListener("click", () =>
-      this.inputState.interpretActionOnElement("select", undefined)
+    closeBtn.addEventListener("click", () =>
+      this.inputState.executeAction("select")
     );
   }
 
-  private setupActiveButtonGroup(
+  private setupButtonGroup(
     selector: string,
     callback: (value: string) => void
   ) {
@@ -44,176 +46,148 @@ export class InputLayer {
       btn.addEventListener("click", () => {
         const key = selector.replace("[data-", "").replace("]", "");
         const value = (btn as HTMLElement).dataset[key];
-        if (value) {
-          callback(value);
-        }
+        if (value) callback(value);
       });
     });
   }
 
   private setupButtons() {
-    this.setupActiveButtonGroup("[data-create]", (createType) => {
-      this.inputState.interpretTypeChange(createType as ElementType);
-    });
-    this.setupActiveButtonGroup("[data-mode]", (mode) => {
-      this.inputState.interpretModeChange(mode as Mode);
-    });
-    this.setupActiveButtonGroup("[data-project]", (action) => {
-      this.inputState.handleAction(action as Action);
-    });
-    this.setupActiveButtonGroup("[data-appearance]", (action) => {
-      this.inputState.handleAction(action as Action);
-    });
-
-    this.setupActiveButtonGroup("[data-option]", (action) => {
-      this.inputState.handleAction(action as Action);
-    });
+    this.setupButtonGroup("[data-create]", (type) =>
+      this.inputState.setElementType(type as ElementType)
+    );
+    this.setupButtonGroup("[data-mode]", (mode) =>
+      this.inputState.setMode(mode as Mode)
+    );
+    this.setupButtonGroup("[data-project]", (action) =>
+      this.inputState.executeAction(action as Action)
+    );
+    this.setupButtonGroup("[data-appearance]", (action) =>
+      this.inputState.executeAction(action as Action)
+    );
+    this.setupButtonGroup("[data-option]", (action) =>
+      this.inputState.executeAction(action as Action)
+    );
   }
 
-  private getCanvasCoordinates(e: MouseEvent): { x: number; y: number } {
+  private getCanvasCoordinates(e: MouseEvent) {
     const rect = this.canvas.getBoundingClientRect();
-    const zoom = this.inputState.zoom;
-    const pan = this.inputState.pan;
-
-    const x = (e.clientX - rect.left) / zoom - pan.x;
-    const y = (e.clientY - rect.top) / zoom - pan.y;
-
-    return { x, y };
+    const { zoom, pan } = this.inputState;
+    return {
+      x: (e.clientX - rect.left) / zoom - pan.x,
+      y: (e.clientY - rect.top) / zoom - pan.y,
+    };
   }
 
-  private handleCanvasEvent = (
+  private withCanvasCoordinates = (
     e: MouseEvent,
     handler: (x: number, y: number, element?: AppElement) => void
   ) => {
     const { x, y } = this.getCanvasCoordinates(e);
-    const elements = this.getElementsCallback();
-    const clickedElement = this.findElementAt(elements, x, y);
-    handler(x, y, clickedElement);
+    const element = this.findElementAt(x, y);
+    handler(x, y, element);
   };
 
   private handleClick = (e: MouseEvent) => {
-    this.handleCanvasEvent(e, (x, y, element) => {
-      this.inputState.interpretClick(x, y, element?.id);
+    this.withCanvasCoordinates(e, (x, y, element) => {
+      this.inputState.onClick(x, y, element?.id);
     });
   };
 
   private handleMouseDown = (e: MouseEvent) => {
-    this.handleCanvasEvent(e, (x, y, element) => {
-      this.inputState.interpretMouseDown(x, y, element);
+    this.withCanvasCoordinates(e, (x, y, element) => {
+      this.inputState.onMouseDown(x, y, element);
     });
   };
 
   private handleMouseUp = () => {
-    this.inputState.interpretMouseUp();
+    this.inputState.onMouseUp();
   };
 
   private handleMouseMove = (e: MouseEvent) => {
+    if (this.inputState.currentMode !== "move" || !this.inputState.activeId)
+      return;
+
     const { x, y } = this.getCanvasCoordinates(e);
-
-    if (this.inputState.secondaryId && this.inputState.currentMode === "move") {
-      const elements = this.getElementsCallback();
-      const draggedElement = elements.find(
-        (el) => el.id === this.inputState.secondaryId
-      );
-
-      if (draggedElement && this.inputState.dragOffset) {
-        this.inputState.interpretDrag(this.inputState.secondaryId, x, y);
-      }
-
-      e.preventDefault();
-    }
+    this.inputState.onDrag(this.inputState.activeId, x, y);
+    e.preventDefault();
   };
 
   private handleDoubleClick = (e: MouseEvent) => {
-    this.handleCanvasEvent(e, (x, y, element) => {
-      if (element) {
-        this.inputState.interpretDoubleClick(x, y, element.id);
-      }
+    this.withCanvasCoordinates(e, (x, y, element) => {
+      if (element) this.inputState.onDoubleClick(x, y, element.id);
     });
   };
 
   private handleContextMenu = (e: MouseEvent) => {
     e.preventDefault();
-    this.handleCanvasEvent(e, (x, y, element) => {
-      this.inputState.interpretContextMenu(x, y, element?.id);
+    this.withCanvasCoordinates(e, (x, y, element) => {
+      this.inputState.onContextMenu(x, y, element?.id);
     });
   };
 
   private handleInput = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    if (!target || target.tagName !== "INPUT") return;
-
-    const activeId = this.inputState.activeId;
-    if (!activeId) return;
-
-    const elementParent = target.closest(".element") as HTMLElement | null;
-    if (elementParent?.dataset.id === activeId) {
-      this.inputState.handleAction("edit", target.value);
+    if (!target || target.tagName !== "INPUT" || !this.inputState.activeId)
       return;
-    }
 
-    const panelInputs = this.getPanelInputsCallback();
-    if (panelInputs.includes(target) && activeId) {
-      this.inputState.handleAction("edit", target.value);
+    const elementParent = target.closest(".element") as HTMLElement;
+    const isElementInput =
+      elementParent?.dataset.id === this.inputState.activeId;
+    const isPanelInput = this.getPanelInputsCallback().includes(target);
+
+    if (isElementInput || isPanelInput) {
+      this.inputState.executeAction("edit", target.value);
     }
   };
 
-  private setupKeyboardShortcuts() {
-    const shortcuts = {
-      KeyQ: () => this.inputState.interpretModeChange("create"),
-      KeyW: () => this.inputState.interpretModeChange("move"),
-      KeyE: () => this.inputState.interpretModeChange("edit"),
-      F2: () =>
-        this.inputState.activeId && this.inputState.handleAction("edit"),
-      KeyA: () =>
-        this.inputState.activeId &&
-        this.inputState.interpretActionOnElement(
-          "anchor",
-          this.inputState.activeId
-        ),
-      Delete: () =>
-        this.inputState.activeId &&
-        !this.inputState.isEditing &&
-        this.inputState.interpretActionOnElement(
-          "delete",
-          this.inputState.activeId
-        ),
-      Backspace: () =>
-        this.inputState.activeId &&
-        !this.inputState.isEditing &&
-        this.inputState.interpretActionOnElement(
-          "delete",
-          this.inputState.activeId
-        ),
+  private getKeyboardShortcuts() {
+    return {
+      normal: {
+        KeyQ: () => this.inputState.setMode("create"),
+        KeyW: () => this.inputState.setMode("move"),
+        KeyE: () => this.inputState.setMode("edit"),
+        F2: () =>
+          this.inputState.activeId && this.inputState.executeAction("edit"),
+        KeyA: () =>
+          this.inputState.activeId && this.inputState.executeAction("anchor"),
+        Delete: () => this.handleDeleteKey(),
+        Backspace: () => this.handleDeleteKey(),
+      },
+      withCtrl: {
+        KeyS: () => this.inputState.executeAction("export"),
+        KeyO: () => this.inputState.executeAction("import"),
+        Equal: () => this.inputState.executeAction("zoomIn"),
+        NumpadAdd: () => this.inputState.executeAction("zoomIn"),
+        Minus: () => this.inputState.executeAction("zoomOut"),
+        NumpadSubtract: () => this.inputState.executeAction("zoomOut"),
+        Digit0: () => this.inputState.executeAction("zoomReset"),
+        Numpad0: () => this.inputState.executeAction("zoomReset"),
+      },
     };
+  }
 
-    const ctrlShortcuts = {
-      KeyS: () => this.inputState.handleAction("export"),
-      KeyO: () => this.inputState.handleAction("import"),
-      Equal: () => this.inputState.handleAction("zoomIn"),
-      NumpadAdd: () => this.inputState.handleAction("zoomIn"),
-      Minus: () => this.inputState.handleAction("zoomOut"),
-      NumpadSubtract: () => this.inputState.handleAction("zoomOut"),
-      Digit0: () => this.inputState.handleAction("zoomReset"),
-      Numpad0: () => this.inputState.handleAction("zoomReset"),
-    };
-
-    return { shortcuts, ctrlShortcuts };
+  private handleDeleteKey() {
+    if (this.inputState.activeId && !this.inputState.isEditing) {
+      this.inputState.executeAction("delete");
+    }
   }
 
   private handleKeyDown = (e: KeyboardEvent) => {
     if (e.code === "Escape") {
-      this.inputState.interpretActionOnElement("select", undefined);
+      this.inputState.clear();
       return;
-    } else if (e.key === "Shift") {
+    }
+
+    if (e.key === "Shift") {
       this.inputState.shiftKey = true;
       return;
     }
 
-    const { shortcuts, ctrlShortcuts } = this.setupKeyboardShortcuts();
+    const shortcuts = this.getKeyboardShortcuts();
 
     if (e.ctrlKey || e.metaKey) {
-      const handler = ctrlShortcuts[e.code as keyof typeof ctrlShortcuts];
+      const handler =
+        shortcuts.withCtrl[e.code as keyof typeof shortcuts.withCtrl];
       if (handler) {
         e.preventDefault();
         handler();
@@ -221,39 +195,42 @@ export class InputLayer {
       }
     }
 
-    if (this.inputState.activeId) {
-      const handler = shortcuts[e.code as keyof typeof shortcuts];
-      if (handler) {
-        handler();
-        return;
-      }
-      if (this.inputState.isEditing && e.key === "Enter") {
-        this.inputState.handleAction("select");
-        e.preventDefault();
-      }
+    const handler = shortcuts.normal[e.code as keyof typeof shortcuts.normal];
+    if (handler) {
+      handler();
+      return;
+    }
+
+    if (this.inputState.isEditing && e.key === "Enter") {
+      this.inputState.executeAction("select");
+      e.preventDefault();
     }
   };
 
   private handleKeyUp = (e: KeyboardEvent) => {
     if (e.key === "Shift") {
       this.inputState.shiftKey = false;
-      return;
     }
   };
 
-  private findElementAt(
-    elements: AppElement[],
-    x: number,
-    y: number
-  ): AppElement | undefined {
+  private findElementAt(x: number, y: number): AppElement | undefined {
+    const elements = this.getElementsCallback();
+
     for (let i = elements.length - 1; i >= 0; i--) {
       const el = elements[i];
-      const left = el.x - el.width / 2;
-      const right = el.x + el.width / 2;
-      const top = el.y - el.height / 2;
-      const bottom = el.y + el.height / 2;
+      const bounds = {
+        left: el.x - el.width / 2,
+        right: el.x + el.width / 2,
+        top: el.y - el.height / 2,
+        bottom: el.y + el.height / 2,
+      };
 
-      if (x >= left && x <= right && y >= top && y <= bottom) {
+      if (
+        x >= bounds.left &&
+        x <= bounds.right &&
+        y >= bounds.top &&
+        y <= bounds.bottom
+      ) {
         return el;
       }
     }

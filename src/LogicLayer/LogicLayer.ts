@@ -30,7 +30,7 @@ export class LogicLayer {
 
     if (!this.inputState.isEditing) this.appState.editingElement = undefined;
 
-    switch (this.inputState.getAction) {
+    switch (this.inputState.action) {
       case "layout":
         this.appState.layout = !this.appState.layout;
         if (this.appState.layout) {
@@ -159,8 +159,8 @@ export class LogicLayer {
   }
 
   private handleMove() {
-    if (this.inputState.secondaryId && this.inputState.mousePosition) {
-      const element = this.appState.getElementById(this.inputState.secondaryId);
+    if (this.inputState.activeId && this.inputState.mousePosition) {
+      const element = this.appState.getElementById(this.inputState.activeId);
       if (element) {
         element.x = this.inputState.mousePosition.x;
         element.y = this.inputState.mousePosition.y;
