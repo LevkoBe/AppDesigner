@@ -67,6 +67,7 @@ export class AppElement {
     const ratioFactor = this.widthRatio / this.heightRatio;
     const sizeFactor = AppElement.BASE_SIZE_UNIT / this.size;
     this.strokeWidth = 15 * Math.pow(sizeFactor, 0.4) * Math.sqrt(ratioFactor);
+    this.parent?.calculateSize();
   }
 
   private getDefaultText(): string {
