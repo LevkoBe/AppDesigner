@@ -33,11 +33,7 @@ export class App {
   private start() {
     const updateLoop = () => {
       try {
-        if (
-          this.inputState.getAction !== "none" ||
-          this.appState.rerenderNeeded ||
-          this.appState.layout
-        ) {
+        if (this.appState.rerenderNeeded || this.appState.layout) {
           this.logicLayer.processInput();
           this.renderLayer.render();
           this.inputState.clear();
