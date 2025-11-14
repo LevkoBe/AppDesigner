@@ -2,6 +2,25 @@
 
 A visual application design tool built with TypeScript that allows you to create, connect, and manage different types of elements in a canvas-based interface.
 
+**Navigation**
+- [Project Structure](#project-structure)
+- [Features](#features)
+  - [Element Types](#element-types)
+  - [Interaction Modes](#interaction-modes)
+  - [Key Features](#key-features)
+- [Setup and Installation](#setup-and-installation)
+- [Usage](#usage)
+  - [Creating Elements](#creating-elements)
+  - [Connecting Elements](#connecting-elements)
+  - [Moving Elements](#moving-elements)
+  - [Editing Elements](#editing-elements)
+  - [Project Management](#project-management)
+- [Architecture](#architecture)
+  - [Core Classes](#core-classes)
+- [Type Safety](#type-safety)
+- [Browser Compatibility](#browser-compatibility)
+- [Contributing](#contributing)
+
 ## Project Structure
 
 ```
@@ -165,7 +184,3 @@ The application is built with strict TypeScript configuration:
 2. Add type definitions for new features
 3. Update documentation for API changes
 4. Ensure all TypeScript strict mode requirements are met
-
-## License
-
-MIT License - see LICENSE file for details
