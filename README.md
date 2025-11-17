@@ -2,6 +2,8 @@
 
 A visual application design tool built with TypeScript that allows you to create, connect, and manage different types of elements in a canvas-based interface.
 
+**🔗 [Live Demo](https://levkobe.github.io/AppDesigner/)**
+
 **Navigation**
 - [Project Structure](#project-structure)
 - [Features](#features)
